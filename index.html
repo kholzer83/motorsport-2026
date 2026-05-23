@@ -185,6 +185,40 @@
     .card--next   { border-color: var(--lav); box-shadow: 0 0 0 3px rgba(192,132,252,.13), var(--shadow-sm); }
     .card--active { border-color: #f97316;    box-shadow: 0 0 0 3px rgba(249,115,22,.13), var(--shadow-sm); }
 
+    /* Card cover photo */
+    .card__photo {
+      margin: -1.4rem -1.5rem 1.25rem -1.7rem;
+      height: 162px;
+      position: relative;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .card__photo img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.45s ease;
+    }
+    .card:hover .card__photo img { transform: scale(1.04); }
+    /* Gradient fade at bottom so photo bleeds into card content */
+    .card__photo::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 48px;
+      background: linear-gradient(transparent, var(--card-fade, #fff));
+      pointer-events: none;
+    }
+    .card--past .card__photo::after { --card-fade: #fdfcfb; }
+    /* Placeholder shown when image is missing or before photos are added */
+    .card__photo--empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      letter-spacing: 0.1em;
+    }
+
     /* Card top row: flag + name + status badge */
     .card__head {
       display: flex;
@@ -544,6 +578,7 @@ const TRIPS = [
     venue: 'Automotodrom Brno',
     series: 'MotoGP', seriesKey: 'motogp',
     color: '#fbbf24',
+    photo: '01-brno.jpg',
     start: new Date(2026, 5, 19),
     end:   new Date(2026, 5, 21),
     lat: 49.20, lng: 16.59,
@@ -565,6 +600,7 @@ const TRIPS = [
     venue: 'Red Bull Ring, Spielberg',
     series: 'Formula 1', seriesKey: 'f1',
     color: '#f472b6',
+    photo: '02-spielberg.jpg',
     start: new Date(2026, 5, 26),
     end:   new Date(2026, 5, 28),
     lat: 47.22, lng: 14.76,
@@ -586,6 +622,7 @@ const TRIPS = [
     venue: 'Norisring, Nuremberg',
     series: 'DTM / Porsche Carrera Cup', seriesKey: 'dtm',
     color: '#60a5fa',
+    photo: '03-norisring.jpg',
     start: new Date(2026, 6, 3),
     end:   new Date(2026, 6, 5),
     lat: 49.43, lng: 11.08,
@@ -609,6 +646,7 @@ const TRIPS = [
     venue: 'Hungaroring, Budapest',
     series: 'Formula 1', seriesKey: 'f1',
     color: '#f472b6',
+    photo: '04-budapest.jpg',
     start: new Date(2026, 6, 24),
     end:   new Date(2026, 6, 26),
     lat: 47.58, lng: 19.25,
@@ -632,6 +670,7 @@ const TRIPS = [
     venue: 'Circuit Zandvoort',
     series: 'Formula 1 – Sprint Weekend', seriesKey: 'sprint',
     color: '#f472b6',
+    photo: '05-zandvoort.jpg',
     start: new Date(2026, 7, 21),
     end:   new Date(2026, 7, 23),
     lat: 52.39, lng: 4.54,
@@ -655,6 +694,7 @@ const TRIPS = [
     venue: 'Autodromo Nazionale Monza',
     series: 'Formula 1', seriesKey: 'f1',
     color: '#f472b6',
+    photo: '06-monza.jpg',
     start: new Date(2026, 8, 4),
     end:   new Date(2026, 8, 6),
     lat: 45.62, lng: 9.29,
@@ -678,6 +718,7 @@ const TRIPS = [
     venue: 'Madring Circuit, Madrid',
     series: 'Formula 1', seriesKey: 'f1',
     color: '#f472b6',
+    photo: '07-madrid.jpg',
     start: new Date(2026, 8, 11),
     end:   new Date(2026, 8, 13),
     lat: 40.42, lng: -3.70,
@@ -696,6 +737,12 @@ const TRIPS = [
     continuation: { arrow: '←', label: 'Continued from Monza via Algarve' },
   },
 ];
+
+/* ══ Hex → rgb components (for photo placeholder gradient) ═════════════ */
+function hexRgb(hex) {
+  const n = parseInt(hex.replace('#',''), 16);
+  return `${(n>>16)&255},${(n>>8)&255},${n&255}`;
+}
 
 /* ══ Series badge CSS keys ══════════════════════════════════════════════ */
 const SERIES_CLS = { f1: 'sbadge--f1', motogp: 'sbadge--motogp', dtm: 'sbadge--dtm', sprint: 'sbadge--sprint' };
@@ -822,7 +869,18 @@ function isActive(i) { return STATUSES[i] === 'active'; }
     el.className = `card ${cardMod}`;
     el.style.setProperty('--accent', st === 'past' ? '#d1d5db' : t.color);
 
+    /* Cover photo – gradient fallback until real photo is dropped in */
+    const rgb = hexRgb(t.color);
+    const photoHtml = `
+      <div class="card__photo card__photo--empty"
+           style="background:linear-gradient(135deg,rgba(${rgb},.18) 0%,rgba(${rgb},.06) 100%)">
+        <img src="./images/${t.photo}" alt="${t.name}" loading="lazy"
+             style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"
+             onerror="this.style.display='none'">
+      </div>`;
+
     el.innerHTML = `
+      ${photoHtml}
       <div class="card__head">
         <div class="card__flag-block">
           <span class="card__flag">${t.flag}</span>
