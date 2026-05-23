@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Motorsport Travel 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #faf9f7;
+      --surface: #ffffff;
+      --border: #ece9e4;
+      --text: #2c2a27;
+      --muted: #9b9590;
+      --f1: #f9c6d0;
+      --f1-accent: #c45070;
+      --motogp: #fde8a0;
+      --motogp-accent: #b8860b;
+      --dtm: #c8d8f0;
+      --dtm-accent: #3a6ab0;
+      --next-ring: #4a7c59;
+      --done-opacity: 0.38;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0 0 72px;
+    }
+
+    header {
+      padding: 52px 24px 36px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: clamp(1.5rem, 4vw, 2.2rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      margin-top: 8px;
+      font-weight: 300;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* MAP */
+    .map-wrap {
+      max-width: 760px;
+      margin: 0 auto 44px;
+      padding: 0 20px;
+    }
+
+    .map-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 22px 18px;
+      overflow: hidden;
+    }
+
+    .map-card h2 {
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    #europe-map {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .venue-label {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 9px;
+      font-weight: 500;
+      pointer-events: none;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.76rem;
+      font-weight: 400;
+      color: var(--muted);
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* CARDS */
+    .section-label {
+      max-width: 760px;
+      margin: 0 auto 10px;
+      padding: 0 20px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    .cards {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: start;
+      gap: 16px;
+    }
+
+    .card.done {
+      opacity: var(--done-opacity);
+    }
+
+    .card.next {
+      outline: 2px solid var(--next-ring);
+      outline-offset: 2px;
+    }
+
+    .card-left {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .card-series {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      padding: 3px 9px;
+      border-radius: 20px;
+      width: fit-content;
+    }
+
+    .card-series.f1     { background: var(--f1);    color: var(--f1-accent); }
+    .card-series.motogp { background: var(--motogp); color: var(--motogp-accent); }
+    .card-series.dtm    { background: var(--dtm);   color: var(--dtm-accent); }
+
+    .next-badge {
+      display: inline-block;
+      font-size: 0.67rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--next-ring);
+      background: #e6f0ea;
+      padding: 2px 8px;
+      border-radius: 20px;
+      width: fit-content;
+    }
+
+    .card-name {
+      font-size: 1rem;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .card-venue {
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: var(--muted);
+    }
+
+    .card-right {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      padding-top: 2px;
+      min-width: 68px;
+    }
+
+    .countdown-num {
+      font-size: 2rem;
+      font-weight: 300;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .countdown-num.done-sym {
+      font-size: 1.4rem;
+      color: var(--muted);
+    }
+
+    .countdown-unit {
+      font-size: 0.7rem;
+      font-weight: 400;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .card-dates {
+      font-size: 0.72rem;
+      font-weight: 300;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    @media (max-width: 480px) {
+      .card {
+        grid-template-columns: 1fr;
+      }
+      .card-right {
+        flex-direction: row;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 8px;
+      }
+      .countdown-num { font-size: 1.5rem; }
+      .card-dates { margin-top: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Motorsport Travel 2026</h1>
+  <p id="today-label"></p>
+</header>
+
+<!-- MAP -->
+<div class="map-wrap">
+  <div class="map-card">
+    <h2>Route durch Europa</h2>
+    <!--
+      Simplified SVG of Europe. Key venue coordinates (viewBox 0 0 700 500):
+      Brno        ~ 400, 228
+      Spielberg   ~ 362, 240
+      Norisring   ~ 325, 215
+      Budapest    ~ 430, 258
+      Zandvoort   ~ 258, 196
+      Monza       ~ 296, 262
+      Madrid      ~ 118, 288
+    -->
+    <svg id="europe-map" viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg" aria-label="Europakarte mit Rennstrecken">
+      <defs>
+        <style>
+          .land { fill: #f0ede8; stroke: #ddd9d2; stroke-width: 1; stroke-linejoin: round; }
+        </style>
+      </defs>
+
+      <!-- Iberian Peninsula -->
+      <path class="land" d="M90,318 L80,298 L72,275 L78,252 L90,235 L112,220 L138,215 L162,218 L178,232 L182,252 L175,272 L162,288 L148,302 L130,312 L110,318 Z"/>
+      <!-- France -->
+      <path class="land" d="M162,218 L182,208 L208,198 L232,193 L255,198 L272,214 L278,232 L272,250 L258,264 L238,272 L215,272 L195,265 L178,252 L175,235 Z"/>
+      <!-- UK mainland -->
+      <path class="land" d="M155,178 L170,168 L185,162 L198,158 L208,164 L210,176 L202,188 L188,196 L172,200 L158,196 L150,186 Z"/>
+      <!-- Ireland -->
+      <path class="land" d="M128,175 L140,168 L150,172 L152,182 L146,190 L135,192 L126,185 Z"/>
+      <!-- Benelux -->
+      <path class="land" d="M248,192 L268,186 L278,194 L272,208 L258,212 L245,205 Z"/>
+      <!-- Germany -->
+      <path class="land" d="M268,186 L295,182 L322,178 L348,182 L368,192 L372,210 L362,226 L340,238 L315,242 L292,240 L272,232 L265,215 Z"/>
+      <!-- Switzerland / Austria -->
+      <path class="land" d="M272,232 L295,228 L322,226 L350,228 L368,232 L372,248 L358,258 L335,262 L308,260 L285,256 L272,248 Z"/>
+      <!-- Italy -->
+      <path class="land" d="M258,264 L278,260 L298,262 L318,272 L330,285 L335,305 L328,322 L315,338 L300,348 L285,350 L272,342 L262,325 L255,305 L252,285 Z"/>
+      <!-- Poland -->
+      <path class="land" d="M348,182 L380,176 L412,174 L440,178 L458,190 L460,208 L448,222 L425,230 L400,232 L375,228 L355,218 L348,205 Z"/>
+      <!-- Czech Republic -->
+      <path class="land" d="M348,205 L375,200 L400,200 L418,208 L420,222 L405,232 L380,235 L358,232 L348,222 Z"/>
+      <!-- Slovakia / Hungary -->
+      <path class="land" d="M372,228 L405,225 L430,228 L450,235 L462,248 L460,265 L445,278 L422,285 L398,282 L375,272 L362,258 L365,242 Z"/>
+      <!-- Romania rough -->
+      <path class="land" d="M445,235 L475,232 L498,238 L512,252 L510,272 L495,288 L472,295 L448,290 L432,278 L430,260 L440,248 Z"/>
+      <!-- Scandinavia (Norway/Sweden simplified) -->
+      <path class="land" d="M272,128 L295,115 L322,105 L350,100 L375,104 L392,118 L395,138 L382,156 L358,168 L332,172 L308,168 L285,155 L272,140 Z"/>
+      <!-- Denmark -->
+      <path class="land" d="M298,172 L312,166 L322,170 L324,182 L314,188 L300,188 L292,180 Z"/>
+      <!-- Finland rough -->
+      <path class="land" d="M355,100 L385,90 L415,88 L440,95 L452,112 L448,132 L432,148 L408,155 L382,152 L360,142 L352,125 Z"/>
+      <!-- Baltic rough -->
+      <path class="land" d="M382,152 L408,148 L432,150 L448,162 L448,178 L430,185 L408,185 L388,178 L378,165 Z"/>
+      <!-- Belarus / Ukraine rough -->
+      <path class="land" d="M430,178 L465,172 L500,168 L528,175 L538,192 L530,212 L510,228 L485,235 L458,232 L440,220 L432,205 Z"/>
+      <!-- Greece rough -->
+      <path class="land" d="M378,308 L398,302 L415,308 L418,325 L408,340 L392,345 L378,338 L372,322 Z"/>
+      <!-- Portugal -->
+      <path class="land" d="M90,235 L106,228 L118,232 L120,248 L112,262 L98,268 L88,258 L86,242 Z"/>
+    </svg>
+
+    <!-- Separate SVG overlay for route + dots, so it layers on top -->
+    <svg style="position:absolute;pointer-events:none;display:none" aria-hidden="true"></svg>
+
+    <script>
+      // Draw route and dots on top of the map using the same viewBox
+      (function() {
+        const venues = [
+          { id: 'brno',      cx: 400, cy: 228, label: 'Brno',      lx: 408, ly: 224, color: '#fde8a0', stroke: '#b8860b', tc: '#7a5f00' },
+          { id: 'spielberg', cx: 362, cy: 240, label: 'Spielberg', lx: 370, ly: 236, color: '#f9c6d0', stroke: '#c45070', tc: '#8a2040' },
+          { id: 'norisring', cx: 325, cy: 215, label: 'Norisring', lx: 333, ly: 211, color: '#c8d8f0', stroke: '#3a6ab0', tc: '#224488' },
+          { id: 'budapest',  cx: 430, cy: 258, label: 'Budapest',  lx: 438, ly: 254, color: '#f9c6d0', stroke: '#c45070', tc: '#8a2040' },
+          { id: 'zandvoort', cx: 258, cy: 196, label: 'Zandvoort', lx: 266, ly: 192, color: '#f9c6d0', stroke: '#c45070', tc: '#8a2040' },
+          { id: 'monza',     cx: 296, cy: 262, label: 'Monza',     lx: 304, ly: 258, color: '#f9c6d0', stroke: '#c45070', tc: '#8a2040' },
+          { id: 'madrid',    cx: 118, cy: 288, label: 'Madrid',    lx: 126, ly: 284, color: '#f9c6d0', stroke: '#c45070', tc: '#8a2040' },
+        ];
+
+        const map = document.getElementById('europe-map');
+        const NS = 'http://www.w3.org/2000/svg';
+
+        // Route line
+        const pts = venues.map(v => `${v.cx},${v.cy}`).join(' ');
+        const line = document.createElementNS(NS, 'polyline');
+        line.setAttribute('points', pts);
+        line.setAttribute('fill', 'none');
+        line.setAttribute('stroke', '#c0bbb4');
+        line.setAttribute('stroke-width', '1.5');
+        line.setAttribute('stroke-dasharray', '5,4');
+        line.setAttribute('stroke-linecap', 'round');
+        line.setAttribute('stroke-linejoin', 'round');
+        map.appendChild(line);
+
+        // Dots and labels
+        venues.forEach(v => {
+          const circle = document.createElementNS(NS, 'circle');
+          circle.setAttribute('cx', v.cx);
+          circle.setAttribute('cy', v.cy);
+          circle.setAttribute('r', 5.5);
+          circle.setAttribute('fill', v.color);
+          circle.setAttribute('stroke', v.stroke);
+          circle.setAttribute('stroke-width', '1.5');
+          map.appendChild(circle);
+
+          const text = document.createElementNS(NS, 'text');
+          text.setAttribute('x', v.lx);
+          text.setAttribute('y', v.ly);
+          text.setAttribute('fill', v.tc);
+          text.setAttribute('font-family', 'DM Sans, sans-serif');
+          text.setAttribute('font-size', '9');
+          text.setAttribute('font-weight', '500');
+          text.textContent = v.label;
+          map.appendChild(text);
+        });
+      })();
+    </script>
+
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#f9c6d0;border:1.5px solid #c45070;"></div>
+        Formula 1
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#fde8a0;border:1.5px solid #b8860b;"></div>
+        MotoGP
+      </div>
+      <div class="legend-item">
+        <div class="legend-dot" style="background:#c8d8f0;border:1.5px solid #3a6ab0;"></div>
+        DTM / Porsche
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CARDS -->
+<p class="section-label">Alle Rennen</p>
+<div class="cards" id="cards"></div>
+
+<script>
+  const TRIPS = [
+    {
+      flag: '🇨🇿',
+      name: 'Brno MotoGP',
+      series: 'motogp',
+      seriesLabel: 'MotoGP',
+      start: '2026-06-19',
+      end:   '2026-06-21',
+      venue: 'Automotodrom Brno',
+    },
+    {
+      flag: '🇦🇹',
+      name: 'Austrian GP',
+      series: 'f1',
+      seriesLabel: 'Formula 1',
+      start: '2026-06-26',
+      end:   '2026-06-28',
+      venue: 'Red Bull Ring, Spielberg',
+    },
+    {
+      flag: '🇩🇪',
+      name: 'Norisring – DTM & Porsche Carrera Cup',
+      series: 'dtm',
+      seriesLabel: 'DTM / Porsche',
+      start: '2026-07-03',
+      end:   '2026-07-05',
+      venue: 'Norisring, Nürnberg',
+    },
+    {
+      flag: '🇭🇺',
+      name: 'Hungarian GP',
+      series: 'f1',
+      seriesLabel: 'Formula 1',
+      start: '2026-07-24',
+      end:   '2026-07-26',
+      venue: 'Hungaroring, Budapest',
+    },
+    {
+      flag: '🇳🇱',
+      name: 'Dutch GP',
+      series: 'f1',
+      seriesLabel: 'Formula 1 · Sprint',
+      start: '2026-08-21',
+      end:   '2026-08-23',
+      venue: 'Circuit Zandvoort',
+    },
+    {
+      flag: '🇮🇹',
+      name: 'Italian GP',
+      series: 'f1',
+      seriesLabel: 'Formula 1',
+      start: '2026-09-04',
+      end:   '2026-09-06',
+      venue: 'Autodromo Nazionale Monza',
+    },
+    {
+      flag: '🇪🇸',
+      name: 'Spanish GP',
+      series: 'f1',
+      seriesLabel: 'Formula 1',
+      start: '2026-09-11',
+      end:   '2026-09-13',
+      venue: 'Madrid Circuit (neu 2026)',
+    },
+  ];
+
+  function parseLocal(str) {
+    const [y, m, d] = str.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+
+  function toAT(str) {
+    const [y, m, d] = str.split('-');
+    return `${d}.${m}.${y}`;
+  }
+
+  function daysUntil(dateStr) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const diff = Math.round((parseLocal(dateStr) - today) / 86400000);
+    return diff;
+  }
+
+  (function setTodayLabel() {
+    const t = new Date();
+    const d = String(t.getDate()).padStart(2, '0');
+    const m = String(t.getMonth() + 1).padStart(2, '0');
+    document.getElementById('today-label').textContent = `Heute: ${d}.${m}.${t.getFullYear()}`;
+  })();
+
+  function findNextIndex() {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    for (let i = 0; i < TRIPS.length; i++) {
+      if (parseLocal(TRIPS[i].end) >= today) return i;
+    }
+    return -1;
+  }
+
+  const nextIdx = findNextIndex();
+  const container = document.getElementById('cards');
+
+  TRIPS.forEach((trip, i) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const isDone = parseLocal(trip.end) < today;
+    const isNext = i === nextIdx;
+    const days   = daysUntil(trip.start);
+
+    let countdownHTML;
+    if (isDone) {
+      countdownHTML = `
+        <div class="countdown-num done-sym">✓</div>
+        <div class="countdown-unit">gewesen</div>`;
+    } else {
+      countdownHTML = `
+        <div class="countdown-num">${days}</div>
+        <div class="countdown-unit">${days === 1 ? 'Tag' : 'Tage'}</div>`;
+    }
+
+    const card = document.createElement('div');
+    card.className = ['card', isDone ? 'done' : '', isNext ? 'next' : ''].filter(Boolean).join(' ');
+    card.innerHTML = `
+      <div class="card-left">
+        <span class="card-series ${trip.series}">${trip.flag} ${trip.seriesLabel}</span>
+        ${isNext ? '<span class="next-badge">Nächste Reise</span>' : ''}
+        <div class="card-name">${trip.name}</div>
+        <div class="card-venue">${trip.venue}</div>
+      </div>
+      <div class="card-right">
+        ${countdownHTML}
+        <div class="card-dates">${toAT(trip.start)} – ${toAT(trip.end)}</div>
+      </div>`;
+
+    container.appendChild(card);
+  });
+</script>
+
+</body>
+</html>
