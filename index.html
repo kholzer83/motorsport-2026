@@ -588,6 +588,144 @@
       animation: blink 1.4s ease-in-out infinite;
     }
 
+    /* ─── Planning Drawer ─── */
+    .pd-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.48);
+      z-index: 890;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.24s ease;
+    }
+    .pd-overlay.open { opacity: 1; pointer-events: auto; }
+
+    .pd-drawer {
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 480px; max-width: 100vw;
+      background: var(--card);
+      display: flex; flex-direction: column;
+      box-shadow: -6px 0 36px rgba(0,0,0,0.14);
+      transform: translateX(100%);
+      transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+      overflow: hidden;
+    }
+    .pd-overlay.open .pd-drawer { transform: translateX(0); }
+
+    .pd-header {
+      padding: 1.3rem 1.5rem;
+      border-bottom: 1px solid var(--divider);
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      flex-shrink: 0;
+    }
+    .pd-trip-info { display: flex; align-items: center; gap: 0.7rem; }
+    .pd-flag { font-size: 1.7rem; line-height: 1; }
+    .pd-name { font-size: 1rem; font-weight: 500; color: var(--text); }
+    .pd-dates-lbl { font-size: 0.76rem; color: var(--muted); margin-top: 0.1rem; }
+    .pd-close {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--grey-soft); border: none;
+      color: var(--text2); font-size: 0.9rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.14s; flex-shrink: 0;
+    }
+    .pd-close:hover { background: var(--border); }
+
+    .pd-body {
+      flex: 1; overflow-y: auto;
+      padding: 1.1rem 1.4rem;
+      display: flex; flex-direction: column; gap: 1rem;
+    }
+
+    .pd-sec {
+      border: 1.5px solid var(--border);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+    }
+    .pd-sec-head {
+      padding: 0.5rem 0.9rem;
+      background: var(--grey-soft);
+      font-size: 0.7rem; font-weight: 500;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      color: var(--text2);
+    }
+    .pd-sec-body { padding: 0.7rem 0.9rem; display: flex; flex-direction: column; gap: 0.55rem; }
+
+    .pd-row { display: flex; align-items: center; gap: 0.5rem; }
+    .pd-lbl { font-size: 0.76rem; color: var(--text2); min-width: 72px; flex-shrink: 0; }
+
+    .pd-sel, .pd-inp {
+      font-family: var(--font); font-size: 0.81rem;
+      padding: 0.35rem 0.6rem;
+      border: 1.5px solid var(--border); border-radius: var(--r-sm);
+      background: var(--card); color: var(--text);
+      outline: none; transition: border-color 0.14s;
+    }
+    .pd-sel:focus, .pd-inp:focus { border-color: var(--lav); }
+    .pd-sel          { flex: 1; min-width: 110px; }
+    .pd-sel--status  { min-width: 130px; }
+    .pd-sel--status[data-v="booked"]  { border-color: #4ade80; background: #f0fdf4; color: #15803d; }
+    .pd-sel--status[data-v="pending"] { border-color: #fbbf24; background: #fffbeb; color: #92400e; }
+    .pd-sel--status[data-v="na"]      { background: var(--grey-soft); color: var(--muted); }
+    .pd-inp--txt   { flex: 1; min-width: 110px; }
+    .pd-inp--num   { width: 72px; flex-shrink: 0; text-align: right; }
+    .pd-inp--nights{ width: 56px; flex-shrink: 0; text-align: right; }
+    .pd-eur        { font-size: 0.78rem; color: var(--muted); flex-shrink: 0; }
+
+    .pd-extra-row { display: flex; align-items: center; gap: 0.5rem; }
+    .pd-extra-row .pd-inp--txt { flex: 1; }
+
+    .pd-footer {
+      border-top: 1px solid var(--divider);
+      padding: 1rem 1.4rem;
+      background: var(--card);
+      flex-shrink: 0;
+      display: flex; flex-direction: column; gap: 0.45rem;
+    }
+    .pd-cost-row {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.84rem; color: var(--text2);
+    }
+    .pd-cost-row--total { font-size: 0.98rem; font-weight: 500; color: var(--text); }
+    .pd-cost-row--booked { color: #15803d; }
+    .pd-amount { font-variant-numeric: tabular-nums; }
+    .pd-btn-save {
+      margin-top: 0.3rem; width: 100%; padding: 0.68rem;
+      background: var(--lav); color: #fff; border: none;
+      border-radius: var(--r-sm); font-family: var(--font);
+      font-size: 0.88rem; font-weight: 500; cursor: pointer;
+      transition: background 0.14s, transform 0.1s;
+    }
+    .pd-btn-save:hover  { background: #a855f7; }
+    .pd-btn-save:active { transform: scale(0.98); }
+    .pd-btn-save.saved  { background: #4ade80; color: #14532d; }
+
+    /* Card planning dots */
+    .card { cursor: pointer; }
+    .card__dots {
+      display: flex; gap: 0.55rem; align-items: center;
+      margin-top: 0.85rem; padding-top: 0.85rem;
+      border-top: 1px solid var(--divider);
+    }
+    .c-dot {
+      display: flex; align-items: center; gap: 0.3rem;
+      font-size: 0.68rem; color: var(--muted);
+    }
+    .c-dot__ring {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .c-dot__ring--booked  { background: #4ade80; }
+    .c-dot__ring--pending { background: #fbbf24; }
+    .c-dot__ring--na      { background: #d1d5db; }
+    .c-dot__ring--empty   { background: transparent; border: 1.5px dashed #d1d5db; }
+    .card__dots-hint {
+      margin-left: auto;
+      font-size: 0.67rem; color: var(--muted);
+      font-style: italic;
+    }
+
+    /* Season budget in stats row */
+    .stat--budget .stat__val { color: #15803d; }
+
     /* ─── Responsive ─── */
     @media (max-width: 640px) {
       .hdr            { padding: 2rem 1rem 2rem; }
@@ -621,6 +759,7 @@
       <div class="stat"><span class="stat__val">5</span><span class="stat__lbl">F1 Grands Prix</span></div>
       <div class="stat"><span class="stat__val">1</span><span class="stat__lbl">MotoGP round</span></div>
       <div class="stat"><span class="stat__val">1</span><span class="stat__lbl">DTM round</span></div>
+      <div class="stat stat--budget"><span class="stat__val" id="stat-season-budget">€ –</span><span class="stat__lbl">gebucht</span></div>
     </div>
   </div>
 </header>
@@ -644,6 +783,135 @@
     <div class="tl-track" id="timeline"></div>
   </div>
 </section>
+
+<!-- ════ PLANNING DRAWER ════ -->
+<div id="pd-overlay" class="pd-overlay" aria-hidden="true">
+  <div class="pd-drawer" role="dialog" aria-label="Trip planen">
+
+    <div class="pd-header" id="pd-header">
+      <div class="pd-trip-info">
+        <span class="pd-flag" id="pd-flag"></span>
+        <div>
+          <div class="pd-name" id="pd-name"></div>
+          <div class="pd-dates-lbl" id="pd-dates-lbl"></div>
+        </div>
+      </div>
+      <button class="pd-close" id="pd-close" aria-label="Schließen">✕</button>
+    </div>
+
+    <div class="pd-body">
+
+      <!-- Anreise -->
+      <div class="pd-sec">
+        <div class="pd-sec-head">🚗 Anreise</div>
+        <div class="pd-sec-body">
+          <div class="pd-row">
+            <span class="pd-lbl">Typ</span>
+            <select class="pd-sel" id="pd-tr-type">
+              <option value="Auto">Auto</option>
+              <option value="Flug">Flug</option>
+              <option value="Zug">Zug</option>
+              <option value="Bus">Bus</option>
+            </select>
+          </div>
+          <div class="pd-row">
+            <span class="pd-lbl">Status</span>
+            <select class="pd-sel pd-sel--status" id="pd-tr-status">
+              <option value="">– Status –</option>
+              <option value="booked">✅ Gebucht</option>
+              <option value="pending">🟡 Offen</option>
+              <option value="na">⬜ Nicht relevant</option>
+            </select>
+          </div>
+          <div class="pd-row">
+            <span class="pd-lbl">Kosten</span>
+            <span class="pd-eur">€</span>
+            <input type="number" class="pd-inp pd-inp--num" id="pd-tr-cost" min="0" step="1" placeholder="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- Event-Ticket -->
+      <div class="pd-sec">
+        <div class="pd-sec-head">🎫 Event-Ticket</div>
+        <div class="pd-sec-body">
+          <div class="pd-row">
+            <span class="pd-lbl">Typ</span>
+            <select class="pd-sel" id="pd-ti-type">
+              <option value="Hospitality">Hospitality</option>
+              <option value="Grandstand">Grandstand</option>
+              <option value="Supercup-Pass">Supercup-Pass</option>
+              <option value="Paddock-Club">Paddock-Club</option>
+            </select>
+          </div>
+          <div class="pd-row">
+            <span class="pd-lbl">Status</span>
+            <select class="pd-sel pd-sel--status" id="pd-ti-status">
+              <option value="">– Status –</option>
+              <option value="booked">✅ Gebucht</option>
+              <option value="pending">🟡 Offen</option>
+              <option value="na">⬜ Nicht relevant</option>
+            </select>
+          </div>
+          <div class="pd-row">
+            <span class="pd-lbl">Kosten</span>
+            <span class="pd-eur">€</span>
+            <input type="number" class="pd-inp pd-inp--num" id="pd-ti-cost" min="0" step="1" placeholder="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- Hotel -->
+      <div class="pd-sec">
+        <div class="pd-sec-head">🏨 Hotel</div>
+        <div class="pd-sec-body">
+          <div class="pd-row">
+            <span class="pd-lbl">Name</span>
+            <input type="text" class="pd-inp pd-inp--txt" id="pd-ho-name" placeholder="Hotelname">
+          </div>
+          <div class="pd-row">
+            <span class="pd-lbl">Nächte</span>
+            <input type="number" class="pd-inp pd-inp--nights" id="pd-ho-nights" min="1" step="1" placeholder="2">
+          </div>
+          <div class="pd-row">
+            <span class="pd-lbl">Status</span>
+            <select class="pd-sel pd-sel--status" id="pd-ho-status">
+              <option value="">– Status –</option>
+              <option value="booked">✅ Gebucht</option>
+              <option value="pending">🟡 Offen</option>
+              <option value="na">⬜ Nicht relevant</option>
+            </select>
+          </div>
+          <div class="pd-row">
+            <span class="pd-lbl">Kosten ges.</span>
+            <span class="pd-eur">€</span>
+            <input type="number" class="pd-inp pd-inp--num" id="pd-ho-cost" min="0" step="1" placeholder="0">
+          </div>
+        </div>
+      </div>
+
+      <!-- Sonstiges -->
+      <div class="pd-sec">
+        <div class="pd-sec-head">📝 Sonstiges</div>
+        <div class="pd-sec-body" id="pd-extras"></div>
+      </div>
+
+    </div><!-- /pd-body -->
+
+    <div class="pd-footer">
+      <div class="pd-cost-row pd-cost-row--total">
+        <span>Gesamtkosten Trip</span>
+        <span class="pd-amount" id="pd-total">€ 0</span>
+      </div>
+      <div class="pd-cost-row pd-cost-row--booked">
+        <span>davon gebucht</span>
+        <span class="pd-amount" id="pd-booked">€ 0</span>
+      </div>
+      <button class="pd-btn-save" id="pd-btn-save">💾 Speichern</button>
+    </div>
+
+  </div>
+</div>
 
 <!-- ════ LIGHTBOX ════ -->
 <div id="lightbox" class="lightbox" aria-hidden="true" role="dialog" aria-label="Photo viewer">
@@ -1009,18 +1277,29 @@ function isActive(i) { return STATUSES[i] === 'active'; }
       ${specialHtml}
       ${contHtml}
       <div id="wx-${t.id}" class="card__wx"><div class="card__wx-loading">Loading forecast…</div></div>
+      <div id="dots-${t.id}" class="card__dots">
+        <div class="c-dot"><span class="c-dot__ring c-dot__ring--empty"></span>Anreise</div>
+        <div class="c-dot"><span class="c-dot__ring c-dot__ring--empty"></span>Ticket</div>
+        <div class="c-dot"><span class="c-dot__ring c-dot__ring--empty"></span>Hotel</div>
+        <span class="card__dots-hint">klicken zum planen →</span>
+      </div>
     `;
 
-    /* Make cover photo open lightbox when a real image loaded */
+    /* Photo → lightbox (stop bubble so card-click doesn't fire) */
     const imgEl = el.querySelector('.card__photo img');
     if (imgEl) {
-      imgEl.addEventListener('load', () => {
-        imgEl.closest('.card__photo').classList.add('has-photo');
-      });
-      imgEl.addEventListener('click', () => {
+      imgEl.addEventListener('load', () => imgEl.closest('.card__photo').classList.add('has-photo'));
+      imgEl.addEventListener('click', e => {
+        e.stopPropagation();
         if (imgEl.style.display !== 'none') openLightbox(imgEl.src, t.name);
       });
     }
+
+    /* Card click → planning drawer (ignore links and photo area) */
+    el.addEventListener('click', e => {
+      if (e.target.closest('a') || e.target.closest('.card__photo')) return;
+      openPlanDrawer(t.id);
+    });
 
     grid.appendChild(el);
   });
@@ -1167,6 +1446,214 @@ function focusTrip(id) {
     setTimeout(() => { if (leafMarkers[id]) leafMarkers[id].openPopup(); }, 450);
   }, 280);
 }
+
+/* ══ Trip Planning Drawer ════════════════════════════════════════════════ */
+(function () {
+  const LS  = 'tripPlan_';
+  let curId = null;
+
+  /* ── DOM refs ── */
+  const ov     = document.getElementById('pd-overlay');
+  const hdr    = document.getElementById('pd-header');
+  const saveBtn= document.getElementById('pd-btn-save');
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Open / close
+  ───────────────────────────────────────────────────────────────────── */
+  window.openPlanDrawer = function (id) {
+    curId = id;
+    const t = TRIPS.find(x => x.id === id);
+    if (!t) return;
+
+    /* Header content + trip-colour gradient */
+    document.getElementById('pd-flag').textContent     = t.flag;
+    document.getElementById('pd-name').textContent     = t.name;
+    document.getElementById('pd-dates-lbl').textContent = fmtRange(t.start, t.end);
+    const rgb = hexRgb(t.color);
+    hdr.style.background = `linear-gradient(135deg,rgba(${rgb},.14) 0%,transparent 70%)`;
+
+    /* Populate form from localStorage */
+    fill(load(id));
+    recalc();
+
+    ov.classList.add('open');
+    ov.setAttribute('aria-hidden', 'false');
+    document.body.style.overflow = 'hidden';
+  };
+
+  function closePlan() {
+    ov.classList.remove('open');
+    ov.setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+    curId = null;
+  }
+
+  document.getElementById('pd-close').addEventListener('click', closePlan);
+  ov.addEventListener('click', e => { if (e.target === ov) closePlan(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && ov.classList.contains('open')) closePlan();
+  });
+
+  /* ─────────────────────────────────────────────────────────────────────
+     localStorage helpers
+  ───────────────────────────────────────────────────────────────────── */
+  function defaultData() {
+    return {
+      travel: { type:'Auto',        status:'', cost:'' },
+      ticket: { type:'Hospitality', status:'', cost:'' },
+      hotel:  { name:'', nights:'', status:'', cost:'' },
+      extras: [{label:'',cost:''},{label:'',cost:''},{label:'',cost:''}],
+    };
+  }
+
+  function load(id) {
+    try { return Object.assign(defaultData(), JSON.parse(localStorage.getItem(LS+id)) || {}); }
+    catch { return defaultData(); }
+  }
+
+  function save(id, data) {
+    localStorage.setItem(LS+id, JSON.stringify(data));
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Form: fill / read
+  ───────────────────────────────────────────────────────────────────── */
+  function fill(d) {
+    sv('pd-tr-type',   d.travel.type);
+    sv('pd-tr-status', d.travel.status);   syncSel('pd-tr-status');
+    sv('pd-tr-cost',   d.travel.cost);
+
+    sv('pd-ti-type',   d.ticket.type);
+    sv('pd-ti-status', d.ticket.status);   syncSel('pd-ti-status');
+    sv('pd-ti-cost',   d.ticket.cost);
+
+    sv('pd-ho-name',   d.hotel.name);
+    sv('pd-ho-nights', d.hotel.nights);
+    sv('pd-ho-status', d.hotel.status);    syncSel('pd-ho-status');
+    sv('pd-ho-cost',   d.hotel.cost);
+
+    /* Extras – rebuild rows */
+    const box = document.getElementById('pd-extras');
+    box.innerHTML = '';
+    (d.extras || defaultData().extras).forEach((ex, i) => {
+      const row = document.createElement('div');
+      row.className = 'pd-extra-row';
+      row.innerHTML = `
+        <input type="text"   class="pd-inp pd-inp--txt" id="pd-ex-lbl-${i}"
+               placeholder="z.B. Parkplatz, Dinner…" value="${esc(ex.label)}">
+        <span class="pd-eur">€</span>
+        <input type="number" class="pd-inp pd-inp--num" id="pd-ex-cost-${i}"
+               min="0" step="1" placeholder="0" value="${esc(ex.cost)}">`;
+      row.querySelectorAll('input').forEach(inp => inp.addEventListener('input', recalc));
+      box.appendChild(row);
+    });
+  }
+
+  function read() {
+    return {
+      travel: { type: gv('pd-tr-type'), status: gv('pd-tr-status'), cost: nv('pd-tr-cost') },
+      ticket: { type: gv('pd-ti-type'), status: gv('pd-ti-status'), cost: nv('pd-ti-cost') },
+      hotel:  { name: gv('pd-ho-name'), nights: nv('pd-ho-nights'),
+                status: gv('pd-ho-status'), cost: nv('pd-ho-cost') },
+      extras: [0,1,2].map(i => ({ label: gv(`pd-ex-lbl-${i}`), cost: nv(`pd-ex-cost-${i}`) })),
+    };
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Small helpers
+  ───────────────────────────────────────────────────────────────────── */
+  function sv(id,v)  { const el=document.getElementById(id); if(el) el.value=v??''; }
+  function gv(id)    { const el=document.getElementById(id); return el?el.value:''; }
+  function nv(id)    { const v=parseFloat(gv(id)); return isNaN(v)?0:v; }
+  function esc(s)    { return String(s??'').replace(/"/g,'&quot;'); }
+  function eur(n)    { return '€ '+Number(n).toLocaleString('de-AT',{minimumFractionDigits:0,maximumFractionDigits:0}); }
+  function syncSel(id) {
+    const el=document.getElementById(id); if(el) el.dataset.v=el.value;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Cost calculation
+  ───────────────────────────────────────────────────────────────────── */
+  function calcCosts(d) {
+    let total=0, booked=0;
+    [{cost:d.travel.cost,status:d.travel.status},
+     {cost:d.ticket.cost,status:d.ticket.status},
+     {cost:d.hotel.cost, status:d.hotel.status}]
+    .forEach(({cost,status}) => {
+      const c=Number(cost)||0; total+=c;
+      if(status==='booked') booked+=c;
+    });
+    (d.extras||[]).forEach(ex => { total+=Number(ex.cost)||0; });
+    return {total,booked};
+  }
+
+  function recalc() {
+    const {total,booked}=calcCosts(read());
+    document.getElementById('pd-total' ).textContent=eur(total);
+    document.getElementById('pd-booked').textContent=eur(booked);
+  }
+
+  /* Live recalc on status change */
+  ['pd-tr-status','pd-ti-status','pd-ho-status'].forEach(id => {
+    document.getElementById(id).addEventListener('change', function(){ syncSel(id); recalc(); });
+  });
+  ['pd-tr-cost','pd-ti-cost','pd-ho-cost'].forEach(id => {
+    document.getElementById(id).addEventListener('input', recalc);
+  });
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Save
+  ───────────────────────────────────────────────────────────────────── */
+  saveBtn.addEventListener('click', () => {
+    if (!curId) return;
+    save(curId, read());
+    refreshDots(curId);
+    refreshSeasonBudget();
+
+    saveBtn.textContent='✓ Gespeichert';
+    saveBtn.classList.add('saved');
+    setTimeout(()=>{ saveBtn.textContent='💾 Speichern'; saveBtn.classList.remove('saved'); }, 1600);
+  });
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Card booking dots
+  ───────────────────────────────────────────────────────────────────── */
+  function dotRing(status) {
+    const cls = {booked:'c-dot__ring--booked',pending:'c-dot__ring--pending',na:'c-dot__ring--na'}[status]||'c-dot__ring--empty';
+    return `<span class="c-dot__ring ${cls}"></span>`;
+  }
+  function statusTip(s) {
+    return {booked:'Gebucht',pending:'Offen',na:'Nicht relevant'}[s]||'Nicht gesetzt';
+  }
+
+  function refreshDots(id) {
+    const el = document.getElementById('dots-'+id);
+    if (!el) return;
+    const d = load(id);
+    el.innerHTML = `
+      <div class="c-dot" title="Anreise: ${statusTip(d.travel.status)}">${dotRing(d.travel.status)}<span>Anreise</span></div>
+      <div class="c-dot" title="Ticket: ${statusTip(d.ticket.status)}">${dotRing(d.ticket.status)}<span>Ticket</span></div>
+      <div class="c-dot" title="Hotel: ${statusTip(d.hotel.status)}">${dotRing(d.hotel.status)}<span>Hotel</span></div>
+      <span class="card__dots-hint">klicken zum planen →</span>`;
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Season budget stat (header)
+  ───────────────────────────────────────────────────────────────────── */
+  function refreshSeasonBudget() {
+    let booked=0;
+    TRIPS.forEach(t => { booked+=calcCosts(load(t.id)).booked; });
+    const el=document.getElementById('stat-season-budget');
+    if (el) el.textContent = booked>0 ? eur(booked) : '€ –';
+  }
+
+  /* ─────────────────────────────────────────────────────────────────────
+     Init on page load
+  ───────────────────────────────────────────────────────────────────── */
+  TRIPS.forEach(t => refreshDots(t.id));
+  refreshSeasonBudget();
+
+}());
 
 /* ══ Lightbox ════════════════════════════════════════════════════════════ */
 (function () {
