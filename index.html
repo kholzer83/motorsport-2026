@@ -2140,7 +2140,7 @@ function focusTrip(id) {
     if (!container) return;
     container.innerHTML = '<div class="pl-loading">⏳ Building your packing list…</div>';
 
-    const trip = (TRIPS).find(x => x.id === id);
+    const trip = TRIPS.find(x => x.id == id);
     if (!trip) { container.innerHTML = '<div class="pl-loading">Trip not found.</div>'; return; }
 
     const plan   = window.loadPlan ? window.loadPlan(id) : {};
