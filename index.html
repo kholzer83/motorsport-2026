@@ -588,117 +588,150 @@
       animation: blink 1.4s ease-in-out infinite;
     }
 
-    /* ─── Planning Drawer ─── */
-    .pd-overlay {
+    /* ─── Planning Modal ─── */
+    .pm-overlay {
       position: fixed; inset: 0;
-      background: rgba(0,0,0,0.48);
+      background: rgba(0,0,0,0.52);
       z-index: 890;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.25rem;
       opacity: 0; pointer-events: none;
-      transition: opacity 0.24s ease;
+      transition: opacity 0.22s ease;
     }
-    .pd-overlay.open { opacity: 1; pointer-events: auto; }
+    .pm-overlay.open { opacity: 1; pointer-events: auto; }
 
-    .pd-drawer {
-      position: absolute;
-      right: 0; top: 0; bottom: 0;
-      width: 480px; max-width: 100vw;
+    .pm-modal {
       background: var(--card);
+      border-radius: var(--r-card);
+      width: 100%; max-width: 560px;
+      max-height: 90vh;
       display: flex; flex-direction: column;
-      box-shadow: -6px 0 36px rgba(0,0,0,0.14);
-      transform: translateX(100%);
-      transition: transform 0.28s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 24px 80px rgba(0,0,0,0.22), 0 4px 16px rgba(0,0,0,0.1);
+      transform: scale(0.96) translateY(10px);
+      transition: transform 0.24s cubic-bezier(.4,0,.2,1);
       overflow: hidden;
     }
-    .pd-overlay.open .pd-drawer { transform: translateX(0); }
+    .pm-overlay.open .pm-modal { transform: scale(1) translateY(0); }
 
-    .pd-header {
-      padding: 1.3rem 1.5rem;
+    .pm-header {
+      padding: 1.2rem 1.5rem;
       border-bottom: 1px solid var(--divider);
       display: flex; align-items: center; justify-content: space-between; gap: 1rem;
       flex-shrink: 0;
     }
-    .pd-trip-info { display: flex; align-items: center; gap: 0.7rem; }
-    .pd-flag { font-size: 1.7rem; line-height: 1; }
-    .pd-name { font-size: 1rem; font-weight: 500; color: var(--text); }
-    .pd-dates-lbl { font-size: 0.76rem; color: var(--muted); margin-top: 0.1rem; }
-    .pd-close {
+    .pm-trip-info { display: flex; align-items: center; gap: 0.75rem; }
+    .pm-flag { font-size: 1.8rem; line-height: 1; }
+    .pm-name { font-size: 1rem; font-weight: 500; color: var(--text); }
+    .pm-dates-lbl { font-size: 0.76rem; color: var(--muted); margin-top: 0.1rem; }
+    .pm-close {
       width: 32px; height: 32px; border-radius: 50%;
       background: var(--grey-soft); border: none;
       color: var(--text2); font-size: 0.9rem; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       transition: background 0.14s; flex-shrink: 0;
     }
-    .pd-close:hover { background: var(--border); }
+    .pm-close:hover { background: var(--border); }
 
-    .pd-body {
+    .pm-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--divider);
+      flex-shrink: 0;
+      padding: 0 1.25rem;
+    }
+    .pm-tab {
+      padding: 0.65rem 1rem;
+      font-size: 0.82rem; font-weight: 500;
+      color: var(--muted);
+      border: none; background: none;
+      cursor: pointer;
+      border-bottom: 2.5px solid transparent;
+      margin-bottom: -1px;
+      transition: color 0.14s, border-color 0.14s;
+      font-family: var(--font);
+      white-space: nowrap;
+    }
+    .pm-tab:hover { color: var(--text2); }
+    .pm-tab.active { color: var(--lav); border-bottom-color: var(--lav); }
+
+    .pm-body {
       flex: 1; overflow-y: auto;
       padding: 1.1rem 1.4rem;
       display: flex; flex-direction: column; gap: 1rem;
     }
 
-    .pd-sec {
+    .pm-sec {
       border: 1.5px solid var(--border);
       border-radius: var(--r-sm);
       overflow: hidden;
     }
-    .pd-sec-head {
+    .pm-sec-head {
       padding: 0.5rem 0.9rem;
       background: var(--grey-soft);
       font-size: 0.7rem; font-weight: 500;
       letter-spacing: 0.08em; text-transform: uppercase;
       color: var(--text2);
     }
-    .pd-sec-body { padding: 0.7rem 0.9rem; display: flex; flex-direction: column; gap: 0.55rem; }
+    .pm-sec-body { padding: 0.75rem 0.9rem; display: flex; flex-direction: column; gap: 0.6rem; }
 
-    .pd-row { display: flex; align-items: center; gap: 0.5rem; }
-    .pd-lbl { font-size: 0.76rem; color: var(--text2); min-width: 72px; flex-shrink: 0; }
+    .pm-row { display: flex; align-items: center; gap: 0.5rem; }
+    .pm-lbl { font-size: 0.76rem; color: var(--text2); min-width: 72px; flex-shrink: 0; }
+    .pm-fill { flex: 1; }
 
-    .pd-sel, .pd-inp {
+    .pm-sel, .pm-inp {
       font-family: var(--font); font-size: 0.81rem;
       padding: 0.35rem 0.6rem;
       border: 1.5px solid var(--border); border-radius: var(--r-sm);
       background: var(--card); color: var(--text);
       outline: none; transition: border-color 0.14s;
     }
-    .pd-sel:focus, .pd-inp:focus { border-color: var(--lav); }
-    .pd-sel          { flex: 1; min-width: 110px; }
-    .pd-sel--status  { min-width: 130px; }
-    .pd-sel--status[data-v="booked"]  { border-color: #4ade80; background: #f0fdf4; color: #15803d; }
-    .pd-sel--status[data-v="pending"] { border-color: #fbbf24; background: #fffbeb; color: #92400e; }
-    .pd-sel--status[data-v="na"]      { background: var(--grey-soft); color: var(--muted); }
-    .pd-sel--status-sm { min-width: 0; width: 115px; }
-    .pd-inp--txt   { flex: 1; min-width: 110px; }
-    .pd-inp--num   { width: 72px; flex-shrink: 0; text-align: right; }
-    .pd-inp--nights{ width: 56px; flex-shrink: 0; text-align: right; }
-    .pd-eur        { font-size: 0.78rem; color: var(--muted); flex-shrink: 0; }
+    .pm-sel:focus, .pm-inp:focus { border-color: var(--lav); }
+    .pm-sel         { flex: 1; }
+    .pm-inp--txt    { flex: 1; min-width: 130px; }
+    .pm-inp--num    { width: 72px; flex-shrink: 0; text-align: right; }
+    .pm-inp--nights { width: 56px; flex-shrink: 0; text-align: right; }
+    .pm-eur         { font-size: 0.78rem; color: var(--muted); flex-shrink: 0; }
 
-    .pd-extra-row { display: flex; align-items: center; gap: 0.5rem; }
-    .pd-extra-row .pd-inp--txt { flex: 1; }
+    .pm-check-row { display: flex; align-items: center; gap: 0.45rem; cursor: pointer; }
+    .pm-check {
+      width: 15px; height: 15px; flex-shrink: 0;
+      accent-color: #4ade80; cursor: pointer;
+    }
+    .pm-check-lbl { font-size: 0.8rem; color: var(--text2); user-select: none; }
 
-    .pd-footer {
+    .pm-extra-row { display: flex; align-items: center; gap: 0.5rem; }
+    .pm-extra-row .pm-inp--txt { flex: 1; }
+
+    .pm-footer {
       border-top: 1px solid var(--divider);
       padding: 1rem 1.4rem;
-      background: var(--card);
-      flex-shrink: 0;
-      display: flex; flex-direction: column; gap: 0.45rem;
+      background: var(--card); flex-shrink: 0;
+      display: flex; flex-direction: column; gap: 0.4rem;
     }
-    .pd-cost-row {
+    .pm-cost-row {
       display: flex; justify-content: space-between; align-items: center;
-      font-size: 0.84rem; color: var(--text2);
+      font-size: 0.98rem; font-weight: 500; color: var(--text);
     }
-    .pd-cost-row--total { font-size: 0.98rem; font-weight: 500; color: var(--text); }
-    .pd-cost-row--booked { color: #15803d; }
-    .pd-amount { font-variant-numeric: tabular-nums; }
-    .pd-btn-save {
+    .pm-amount { font-variant-numeric: tabular-nums; }
+    .pm-btn-save {
       margin-top: 0.3rem; width: 100%; padding: 0.68rem;
       background: var(--lav); color: #fff; border: none;
       border-radius: var(--r-sm); font-family: var(--font);
       font-size: 0.88rem; font-weight: 500; cursor: pointer;
       transition: background 0.14s, transform 0.1s;
     }
-    .pd-btn-save:hover  { background: #a855f7; }
-    .pd-btn-save:active { transform: scale(0.98); }
-    .pd-btn-save.saved  { background: #4ade80; color: #14532d; }
+    .pm-btn-save:hover  { background: #a855f7; }
+    .pm-btn-save:active { transform: scale(0.98); }
+    .pm-btn-save.saved  { background: #4ade80; color: #14532d; }
+
+    .pm-coming-soon {
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; padding: 3rem 1rem; color: var(--muted);
+      flex: 1;
+    }
+    .pm-coming-soon__icon  { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .pm-coming-soon__title { font-size: 0.92rem; font-weight: 500; color: var(--text2); margin-bottom: 0.4rem; }
+    .pm-coming-soon__text  { font-size: 0.8rem; line-height: 1.55; }
 
     /* Card planning dots */
     .card { cursor: pointer; }
@@ -727,6 +760,97 @@
     /* Season budget in stats row */
     .stat--budget .stat__val { color: #15803d; }
 
+    /* ─── Packing List (Tab 2) ─── */
+    .pl-loading { text-align:center; padding:2rem 1rem; font-size:0.82rem; color:var(--muted); animation:blink 1.4s ease-in-out infinite; }
+    .pl-wx-bar {
+      display:flex; flex-wrap:wrap; gap:0.4rem 0.7rem; align-items:center;
+      padding:0.6rem 0.9rem; background:#f0f9ff; border:1.5px solid #bae6fd;
+      border-radius:var(--r-sm); font-size:0.82rem; color:var(--text2);
+    }
+    .pl-wx-sep  { height:1px; background:var(--divider); margin:0.1rem 0 0.3rem; }
+    .pl-wx-notice { flex-basis:100%; font-size:0.72rem; color:var(--muted); font-style:italic; margin-bottom:0.2rem; }
+    .pl-wx-day {
+      display:flex; flex-direction:column; align-items:center; gap:0.12rem;
+      padding:0.3rem 0.4rem; background:#e0f2fe; border-radius:var(--r-sm);
+      font-size:0.72rem; color:var(--text2); text-align:center; min-width:52px;
+    }
+    .pl-ctx {
+      border:1.5px solid var(--amber); background:var(--amber-soft);
+      border-radius:var(--r-sm); padding:0.8rem 0.9rem;
+      display:flex; flex-direction:column; gap:0.55rem;
+    }
+    .pl-ctx-title { font-size:0.76rem; font-weight:500; color:#92400e; }
+    .pl-ctx-row   { display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; }
+    .pl-ctx-lbl   { font-size:0.75rem; color:var(--text2); min-width:82px; flex-shrink:0; }
+    .pl-ctx-btn {
+      padding:0.3rem 0.65rem; border:none; border-radius:var(--r-pill);
+      font-family:var(--font); font-size:0.76rem; cursor:pointer;
+      background:var(--lav); color:#fff; transition:opacity 0.14s;
+    }
+    .pl-ctx-btn:hover          { opacity:0.85; }
+    .pl-ctx-btn--sky           { background:var(--sky); }
+    .pl-ctx-btn--grey          { background:var(--grey); }
+    .pl-actions { display:flex; gap:0.4rem; flex-wrap:wrap; }
+    .pl-btn {
+      padding:0.35rem 0.7rem; font-family:var(--font); font-size:0.77rem;
+      border:1.5px solid var(--border); background:var(--card);
+      border-radius:var(--r-pill); cursor:pointer; color:var(--text2);
+      transition:border-color 0.14s, color 0.14s; white-space:nowrap;
+    }
+    .pl-btn:hover { border-color:var(--lav); color:#7c3aed; }
+    .pl-section   { display:flex; flex-direction:column; }
+    .pl-sec-head  {
+      font-size:0.7rem; font-weight:500; letter-spacing:0.08em;
+      text-transform:uppercase; color:var(--text2);
+      padding:0.5rem 0 0.3rem; border-bottom:1px solid var(--divider);
+    }
+    .pl-list  { display:flex; flex-direction:column; }
+    .pl-item  {
+      display:flex; align-items:flex-start; gap:0.55rem;
+      padding:0.42rem 0.1rem; border-bottom:1px solid var(--divider);
+    }
+    .pl-item:last-child { border-bottom:none; }
+    .pl-item--custom {
+      background:var(--lav-soft); border-radius:var(--r-sm);
+      padding:0.38rem 0.6rem; margin:0.1rem 0; border-bottom:none !important;
+    }
+    .pl-item.checked .pl-item-lbl { text-decoration:line-through; color:var(--muted); }
+    .pl-cb       { width:15px; height:15px; flex-shrink:0; accent-color:var(--lav); cursor:pointer; margin-top:2px; }
+    .pl-item-lbl { font-size:0.82rem; color:var(--text2); flex:1; line-height:1.4; cursor:pointer; }
+    .pl-icons    { display:flex; gap:0.2rem; align-items:center; flex-shrink:0; margin-top:1px; }
+    .pl-info, .pl-share {
+      position:relative; cursor:help; font-size:0.75rem;
+      display:flex; align-items:center;
+    }
+    .pl-info:hover .pl-tt, .pl-share:hover .pl-tt { display:block; }
+    .pl-tt {
+      display:none; position:absolute;
+      right:0; bottom:calc(100% + 5px);
+      background:#1c1917; color:#fff;
+      font-size:0.71rem; line-height:1.4;
+      padding:0.35rem 0.6rem; border-radius:6px;
+      width:190px; white-space:normal; z-index:20; pointer-events:none;
+    }
+    .pl-del {
+      border:none; background:none; cursor:pointer;
+      font-size:0.78rem; color:var(--muted); padding:0; line-height:1;
+      transition:color 0.14s;
+    }
+    .pl-del:hover { color:#ef4444; }
+    .pl-add-form {
+      border:1.5px dashed var(--border); border-radius:var(--r-sm);
+      padding:0.65rem 0.8rem;
+    }
+    .pl-add-row { display:flex; gap:0.45rem; align-items:center; }
+    .pl-add-row .pm-inp { flex:1; font-size:0.8rem; }
+    .pl-add-row .pm-sel { width:120px; flex-shrink:0; font-size:0.8rem; }
+    .pl-add-btn {
+      padding:0.35rem 0.7rem; border:none; border-radius:var(--r-sm);
+      background:var(--lav); color:#fff; font-family:var(--font);
+      font-size:0.8rem; cursor:pointer; flex-shrink:0; transition:background 0.14s;
+    }
+    .pl-add-btn:hover { background:#a855f7; }
+
     /* ─── Responsive ─── */
     @media (max-width: 640px) {
       .hdr            { padding: 2rem 1rem 2rem; }
@@ -735,6 +859,8 @@
       #map            { height: 360px; }
       .stat           { padding-right: 0.9rem; margin-right: 0.6rem; }
       .stat__val      { font-size: 1.3rem; }
+      .pm-modal       { max-height: 96vh; border-radius: var(--r-sm); }
+      .pm-overlay     { padding: 0.5rem; }
     }
     @media (max-width: 400px) {
       .hdr__stats     { gap: 0.3rem 0; }
@@ -760,7 +886,7 @@
       <div class="stat"><span class="stat__val">5</span><span class="stat__lbl">F1 Grands Prix</span></div>
       <div class="stat"><span class="stat__val">1</span><span class="stat__lbl">MotoGP round</span></div>
       <div class="stat"><span class="stat__val">1</span><span class="stat__lbl">DTM round</span></div>
-      <div class="stat stat--budget"><span class="stat__val" id="stat-season-budget">€ –</span><span class="stat__lbl">booked</span></div>
+      <div class="stat stat--budget"><span class="stat__val" id="stat-season-budget">€ –</span><span class="stat__lbl">total costs</span></div>
     </div>
   </div>
 </header>
@@ -785,130 +911,116 @@
   </div>
 </section>
 
-<!-- ════ PLANNING DRAWER ════ -->
-<div id="pd-overlay" class="pd-overlay" aria-hidden="true">
-  <div class="pd-drawer" role="dialog" aria-label="Plan trip">
+<!-- ════ PLANNING MODAL ════ -->
+<div id="pm-overlay" class="pm-overlay" aria-hidden="true">
+  <div class="pm-modal" role="dialog" aria-modal="true" aria-label="Plan trip">
 
-    <div class="pd-header" id="pd-header">
-      <div class="pd-trip-info">
-        <span class="pd-flag" id="pd-flag"></span>
+    <div class="pm-header" id="pm-header">
+      <div class="pm-trip-info">
+        <span class="pm-flag" id="pm-flag"></span>
         <div>
-          <div class="pd-name" id="pd-name"></div>
-          <div class="pd-dates-lbl" id="pd-dates-lbl"></div>
+          <div class="pm-name" id="pm-name"></div>
+          <div class="pm-dates-lbl" id="pm-dates-lbl"></div>
         </div>
       </div>
-      <button class="pd-close" id="pd-close" aria-label="Close">✕</button>
+      <button class="pm-close" id="pm-close" aria-label="Close">✕</button>
     </div>
 
-    <div class="pd-body">
+    <div class="pm-tabs" role="tablist">
+      <button class="pm-tab active" data-tab="bookings" role="tab" aria-selected="true">✈ Bookings &amp; Costs</button>
+      <button class="pm-tab" data-tab="packing" role="tab" aria-selected="false">📋 Packing List</button>
+    </div>
 
-      <!-- Travel -->
-      <div class="pd-sec">
-        <div class="pd-sec-head">🚗 Travel</div>
-        <div class="pd-sec-body">
-          <div class="pd-row">
-            <span class="pd-lbl">Type</span>
-            <select class="pd-sel" id="pd-tr-type">
+    <!-- Tab 1: Bookings & Costs -->
+    <div class="pm-body" id="pm-tab-bookings" role="tabpanel">
+
+      <div class="pm-sec">
+        <div class="pm-sec-head">🚗 Travel</div>
+        <div class="pm-sec-body">
+          <div class="pm-row">
+            <span class="pm-lbl">Type</span>
+            <select class="pm-sel" id="pm-tr-type">
               <option value="Car">Car</option>
               <option value="Flight">Flight</option>
               <option value="Train">Train</option>
               <option value="Bus">Bus</option>
             </select>
           </div>
-          <div class="pd-row">
-            <span class="pd-lbl">Status</span>
-            <select class="pd-sel pd-sel--status" id="pd-tr-status">
-              <option value="">– Status –</option>
-              <option value="booked">✅ Booked</option>
-              <option value="pending">🟡 Open</option>
-              <option value="na">⬜ Not relevant</option>
-            </select>
-          </div>
-          <div class="pd-row">
-            <span class="pd-lbl">Cost</span>
-            <span class="pd-eur">€</span>
-            <input type="number" class="pd-inp pd-inp--num" id="pd-tr-cost" min="0" step="1" placeholder="0">
+          <div class="pm-row">
+            <label class="pm-check-row">
+              <input type="checkbox" class="pm-check" id="pm-tr-booked">
+              <span class="pm-check-lbl">Booked</span>
+            </label>
+            <span class="pm-fill"></span>
+            <span class="pm-eur">€</span>
+            <input type="number" class="pm-inp pm-inp--num" id="pm-tr-cost" min="0" step="1" placeholder="0">
           </div>
         </div>
       </div>
 
-      <!-- Ticket -->
-      <div class="pd-sec">
-        <div class="pd-sec-head">🎫 Ticket</div>
-        <div class="pd-sec-body">
-          <div class="pd-row">
-            <span class="pd-lbl">Type</span>
-            <select class="pd-sel" id="pd-ti-type">
+      <div class="pm-sec">
+        <div class="pm-sec-head">🎫 Event Ticket</div>
+        <div class="pm-sec-body">
+          <div class="pm-row">
+            <span class="pm-lbl">Type</span>
+            <select class="pm-sel" id="pm-ti-type">
               <option value="Hospitality">Hospitality</option>
               <option value="Grandstand">Grandstand</option>
               <option value="Supercup Pass">Supercup Pass</option>
               <option value="Paddock Club">Paddock Club</option>
             </select>
           </div>
-          <div class="pd-row">
-            <span class="pd-lbl">Status</span>
-            <select class="pd-sel pd-sel--status" id="pd-ti-status">
-              <option value="">– Status –</option>
-              <option value="booked">✅ Booked</option>
-              <option value="pending">🟡 Open</option>
-              <option value="na">⬜ Not relevant</option>
-            </select>
-          </div>
-          <div class="pd-row">
-            <span class="pd-lbl">Cost</span>
-            <span class="pd-eur">€</span>
-            <input type="number" class="pd-inp pd-inp--num" id="pd-ti-cost" min="0" step="1" placeholder="0">
+          <div class="pm-row">
+            <label class="pm-check-row">
+              <input type="checkbox" class="pm-check" id="pm-ti-booked">
+              <span class="pm-check-lbl">Booked</span>
+            </label>
+            <span class="pm-fill"></span>
+            <span class="pm-eur">€</span>
+            <input type="number" class="pm-inp pm-inp--num" id="pm-ti-cost" min="0" step="1" placeholder="0">
           </div>
         </div>
       </div>
 
-      <!-- Hotel -->
-      <div class="pd-sec">
-        <div class="pd-sec-head">🏨 Hotel</div>
-        <div class="pd-sec-body">
-          <div class="pd-row">
-            <span class="pd-lbl">Name</span>
-            <input type="text" class="pd-inp pd-inp--txt" id="pd-ho-name" placeholder="Hotel name">
+      <div class="pm-sec">
+        <div class="pm-sec-head">🏨 Hotel</div>
+        <div class="pm-sec-body">
+          <div class="pm-row">
+            <span class="pm-lbl">Name</span>
+            <input type="text" class="pm-inp pm-inp--txt" id="pm-ho-name" placeholder="Hotel name">
           </div>
-          <div class="pd-row">
-            <span class="pd-lbl">Nights</span>
-            <input type="number" class="pd-inp pd-inp--nights" id="pd-ho-nights" min="1" step="1" placeholder="2">
+          <div class="pm-row">
+            <span class="pm-lbl">Nights</span>
+            <input type="number" class="pm-inp pm-inp--nights" id="pm-ho-nights" min="1" step="1" placeholder="2">
           </div>
-          <div class="pd-row">
-            <span class="pd-lbl">Status</span>
-            <select class="pd-sel pd-sel--status" id="pd-ho-status">
-              <option value="">– Status –</option>
-              <option value="booked">✅ Booked</option>
-              <option value="pending">🟡 Open</option>
-              <option value="na">⬜ Not relevant</option>
-            </select>
-          </div>
-          <div class="pd-row">
-            <span class="pd-lbl">Total cost</span>
-            <span class="pd-eur">€</span>
-            <input type="number" class="pd-inp pd-inp--num" id="pd-ho-cost" min="0" step="1" placeholder="0">
+          <div class="pm-row">
+            <label class="pm-check-row">
+              <input type="checkbox" class="pm-check" id="pm-ho-booked">
+              <span class="pm-check-lbl">Booked</span>
+            </label>
+            <span class="pm-fill"></span>
+            <span class="pm-eur">€</span>
+            <input type="number" class="pm-inp pm-inp--num" id="pm-ho-cost" min="0" step="1" placeholder="0">
           </div>
         </div>
       </div>
 
-      <!-- Other -->
-      <div class="pd-sec">
-        <div class="pd-sec-head">📝 Other</div>
-        <div class="pd-sec-body" id="pd-extras"></div>
+      <div class="pm-sec">
+        <div class="pm-sec-head">📝 Other</div>
+        <div class="pm-sec-body" id="pm-extras"></div>
       </div>
 
-    </div><!-- /pd-body -->
+    </div><!-- /pm-tab-bookings -->
 
-    <div class="pd-footer">
-      <div class="pd-cost-row pd-cost-row--total">
+    <!-- Tab 2: Packing List -->
+    <div class="pm-body" id="pm-tab-packing" role="tabpanel" style="display:none"></div>
+
+    <div class="pm-footer" id="pm-footer">
+      <div class="pm-cost-row">
         <span>Total trip cost</span>
-        <span class="pd-amount" id="pd-total">€ 0</span>
+        <span class="pm-amount" id="pm-total">€ 0</span>
       </div>
-      <div class="pd-cost-row pd-cost-row--booked">
-        <span>of which booked</span>
-        <span class="pd-amount" id="pd-booked">€ 0</span>
-      </div>
-      <button class="pd-btn-save" id="pd-btn-save">💾 Save</button>
+      <button class="pm-btn-save" id="pm-btn-save">💾 Save</button>
     </div>
 
   </div>
@@ -1296,10 +1408,10 @@ function isActive(i) { return STATUSES[i] === 'active'; }
       });
     }
 
-    /* Card click → planning drawer (ignore links and photo area) */
+    /* Card click → planning modal (ignore links and photo area) */
     el.addEventListener('click', e => {
       if (e.target.closest('a') || e.target.closest('.card__photo')) return;
-      openPlanDrawer(t.id);
+      openPlanModal(t.id);
     });
 
     grid.appendChild(el);
@@ -1439,7 +1551,7 @@ let map = null;
 /* ══ Focus trip on map ═══════════════════════════════════════════════════ */
 function focusTrip(id) {
   if (!map) return;
-  const t = TRIPS.find(x => x.id === id);
+  const t = TRIPS.find(x => x.id == id);
   if (!t) return;
   document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
   setTimeout(() => {
@@ -1453,28 +1565,26 @@ function focusTrip(id) {
   const LS  = 'tripPlan_';
   let curId = null;
 
-  /* ── DOM refs ── */
-  const ov     = document.getElementById('pd-overlay');
-  const hdr    = document.getElementById('pd-header');
-  const saveBtn= document.getElementById('pd-btn-save');
+  const ov      = document.getElementById('pm-overlay');
+  const hdr     = document.getElementById('pm-header');
+  const saveBtn = document.getElementById('pm-btn-save');
 
   /* ─────────────────────────────────────────────────────────────────────
      Open / close
   ───────────────────────────────────────────────────────────────────── */
-  window.openPlanDrawer = function (id) {
+  window.openPlanModal = function (id) {
     curId = id;
-    const t = TRIPS.find(x => x.id === id);
+    const t = TRIPS.find(x => x.id == id);
     if (!t) return;
 
-    /* Header content + trip-colour gradient */
-    document.getElementById('pd-flag').textContent     = t.flag;
-    document.getElementById('pd-name').textContent     = t.name;
-    document.getElementById('pd-dates-lbl').textContent = fmtRange(t.start, t.end);
+    document.getElementById('pm-flag').textContent      = t.flag;
+    document.getElementById('pm-name').textContent      = t.name;
+    document.getElementById('pm-dates-lbl').textContent = fmtRange(t.start, t.end);
     const rgb = hexRgb(t.color);
     hdr.style.background = `linear-gradient(135deg,rgba(${rgb},.14) 0%,transparent 70%)`;
 
-    /* Populate form from localStorage */
-    fill(load(id));
+    switchTab('bookings');
+    fill(loadPlan(id));
     recalc();
 
     ov.classList.add('open');
@@ -1482,17 +1592,37 @@ function focusTrip(id) {
     document.body.style.overflow = 'hidden';
   };
 
-  function closePlan() {
+  function closeModal() {
     ov.classList.remove('open');
     ov.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
     curId = null;
   }
 
-  document.getElementById('pd-close').addEventListener('click', closePlan);
-  ov.addEventListener('click', e => { if (e.target === ov) closePlan(); });
+  function switchTab(tab) {
+    document.querySelectorAll('.pm-tab').forEach(btn => {
+      const on = btn.dataset.tab === tab;
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-selected', on);
+    });
+    const bk = document.getElementById('pm-tab-bookings');
+    const pk = document.getElementById('pm-tab-packing');
+    const ft = document.getElementById('pm-footer');
+    if (tab === 'bookings') {
+      bk.style.display = '';   pk.style.display = 'none'; ft.style.display = '';
+    } else {
+      bk.style.display = 'none'; pk.style.display = '';   ft.style.display = 'none';
+      if (curId && window.renderPackingTab) window.renderPackingTab(curId);
+    }
+  }
+  document.querySelectorAll('.pm-tab').forEach(btn =>
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab))
+  );
+
+  document.getElementById('pm-close').addEventListener('click', closeModal);
+  ov.addEventListener('click', e => { if (e.target === ov) closeModal(); });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && ov.classList.contains('open')) closePlan();
+    if (e.key === 'Escape' && ov.classList.contains('open')) closeModal();
   });
 
   /* ─────────────────────────────────────────────────────────────────────
@@ -1500,73 +1630,64 @@ function focusTrip(id) {
   ───────────────────────────────────────────────────────────────────── */
   function defaultData() {
     return {
-      travel: { type:'Car',         status:'', cost:'' },
-      ticket: { type:'Hospitality', status:'', cost:'' },
-      hotel:  { name:'', nights:'', status:'', cost:'' },
-      extras: [{label:'',cost:'',status:''},{label:'',cost:'',status:''},{label:'',cost:'',status:''}],
+      travel: { type:'Car',         booked:false, cost:'' },
+      ticket: { type:'Hospitality', booked:false, cost:'' },
+      hotel:  { name:'', nights:'',  booked:false, cost:'' },
+      extras: [{label:'',cost:''},{label:'',cost:''},{label:'',cost:''}],
     };
   }
-
-  function load(id) {
+  window.loadPlan = function(id) {
     try { return Object.assign(defaultData(), JSON.parse(localStorage.getItem(LS+id)) || {}); }
     catch { return defaultData(); }
-  }
-
-  function save(id, data) {
-    localStorage.setItem(LS+id, JSON.stringify(data));
-  }
+  };
+  function loadPlan(id) { return window.loadPlan(id); }
+  function savePlan(id, data) { localStorage.setItem(LS+id, JSON.stringify(data)); }
 
   /* ─────────────────────────────────────────────────────────────────────
      Form: fill / read
   ───────────────────────────────────────────────────────────────────── */
   function fill(d) {
-    sv('pd-tr-type',   d.travel.type);
-    sv('pd-tr-status', d.travel.status);   syncSel('pd-tr-status');
-    sv('pd-tr-cost',   d.travel.cost);
+    sv('pm-tr-type',  d.travel.type);
+    const trCb = document.getElementById('pm-tr-booked');
+    if (trCb) trCb.checked = !!d.travel.booked;
+    sv('pm-tr-cost',  d.travel.cost);
 
-    sv('pd-ti-type',   d.ticket.type);
-    sv('pd-ti-status', d.ticket.status);   syncSel('pd-ti-status');
-    sv('pd-ti-cost',   d.ticket.cost);
+    sv('pm-ti-type',  d.ticket.type);
+    const tiCb = document.getElementById('pm-ti-booked');
+    if (tiCb) tiCb.checked = !!d.ticket.booked;
+    sv('pm-ti-cost',  d.ticket.cost);
 
-    sv('pd-ho-name',   d.hotel.name);
-    sv('pd-ho-nights', d.hotel.nights);
-    sv('pd-ho-status', d.hotel.status);    syncSel('pd-ho-status');
-    sv('pd-ho-cost',   d.hotel.cost);
+    sv('pm-ho-name',   d.hotel.name);
+    sv('pm-ho-nights', d.hotel.nights);
+    const hoCb = document.getElementById('pm-ho-booked');
+    if (hoCb) hoCb.checked = !!d.hotel.booked;
+    sv('pm-ho-cost',   d.hotel.cost);
 
     /* Extras – rebuild rows */
-    const box = document.getElementById('pd-extras');
+    const box = document.getElementById('pm-extras');
     box.innerHTML = '';
     (d.extras || defaultData().extras).forEach((ex, i) => {
       const row = document.createElement('div');
-      row.className = 'pd-extra-row';
+      row.className = 'pm-extra-row';
       row.innerHTML = `
-        <input type="text"   class="pd-inp pd-inp--txt" id="pd-ex-lbl-${i}"
+        <input type="text"   class="pm-inp pm-inp--txt" id="pm-ex-lbl-${i}"
                placeholder="e.g. Parking, Dinner…" value="${esc(ex.label)}">
-        <select class="pd-sel pd-sel--status pd-sel--status-sm" id="pd-ex-status-${i}">
-          <option value="">–</option>
-          <option value="booked">✅ Booked</option>
-          <option value="pending">🟡 Open</option>
-          <option value="na">⬜ N/A</option>
-        </select>
-        <span class="pd-eur">€</span>
-        <input type="number" class="pd-inp pd-inp--num" id="pd-ex-cost-${i}"
+        <span class="pm-eur">€</span>
+        <input type="number" class="pm-inp pm-inp--num" id="pm-ex-cost-${i}"
                min="0" step="1" placeholder="0" value="${esc(ex.cost)}">`;
-      const selEl = row.querySelector(`#pd-ex-status-${i}`);
-      selEl.value = ex.status || '';
-      selEl.dataset.v = selEl.value;
-      selEl.addEventListener('change', function() { this.dataset.v = this.value; recalc(); });
       row.querySelectorAll('input').forEach(inp => inp.addEventListener('input', recalc));
       box.appendChild(row);
     });
   }
 
   function read() {
+    const cb = id => { const el=document.getElementById(id); return el?el.checked:false; };
     return {
-      travel: { type: gv('pd-tr-type'), status: gv('pd-tr-status'), cost: nv('pd-tr-cost') },
-      ticket: { type: gv('pd-ti-type'), status: gv('pd-ti-status'), cost: nv('pd-ti-cost') },
-      hotel:  { name: gv('pd-ho-name'), nights: nv('pd-ho-nights'),
-                status: gv('pd-ho-status'), cost: nv('pd-ho-cost') },
-      extras: [0,1,2].map(i => ({ label: gv(`pd-ex-lbl-${i}`), cost: nv(`pd-ex-cost-${i}`), status: gv(`pd-ex-status-${i}`) })),
+      travel: { type: gv('pm-tr-type'), booked: cb('pm-tr-booked'), cost: nv('pm-tr-cost') },
+      ticket: { type: gv('pm-ti-type'), booked: cb('pm-ti-booked'), cost: nv('pm-ti-cost') },
+      hotel:  { name: gv('pm-ho-name'), nights: nv('pm-ho-nights'),
+                booked: cb('pm-ho-booked'), cost: nv('pm-ho-cost') },
+      extras: [0,1,2].map(i => ({ label: gv(`pm-ex-lbl-${i}`), cost: nv(`pm-ex-cost-${i}`) })),
     };
   }
 
@@ -1578,41 +1699,27 @@ function focusTrip(id) {
   function nv(id)    { const v=parseFloat(gv(id)); return isNaN(v)?0:v; }
   function esc(s)    { return String(s??'').replace(/"/g,'&quot;'); }
   function eur(n)    { return '€ '+Number(n).toLocaleString('de-AT',{minimumFractionDigits:0,maximumFractionDigits:0}); }
-  function syncSel(id) {
-    const el=document.getElementById(id); if(el) el.dataset.v=el.value;
-  }
 
   /* ─────────────────────────────────────────────────────────────────────
      Cost calculation
   ───────────────────────────────────────────────────────────────────── */
-  function calcCosts(d) {
-    let total=0, booked=0;
-    [{cost:d.travel.cost,status:d.travel.status},
-     {cost:d.ticket.cost,status:d.ticket.status},
-     {cost:d.hotel.cost, status:d.hotel.status}]
-    .forEach(({cost,status}) => {
-      const c=Number(cost)||0; total+=c;
-      if(status==='booked') booked+=c;
-    });
-    (d.extras||[]).forEach(ex => {
-      const c=Number(ex.cost)||0; total+=c;
-      if(ex.status==='booked') booked+=c;
-    });
-    return {total,booked};
+  function calcTotal(d) {
+    let total = 0;
+    [d.travel.cost, d.ticket.cost, d.hotel.cost].forEach(c => { total += Number(c)||0; });
+    (d.extras||[]).forEach(ex => { total += Number(ex.cost)||0; });
+    return total;
   }
 
   function recalc() {
-    const {total,booked}=calcCosts(read());
-    document.getElementById('pd-total' ).textContent=eur(total);
-    document.getElementById('pd-booked').textContent=eur(booked);
+    document.getElementById('pm-total').textContent = eur(calcTotal(read()));
   }
 
-  /* Live recalc on status change */
-  ['pd-tr-status','pd-ti-status','pd-ho-status'].forEach(id => {
-    document.getElementById(id).addEventListener('change', function(){ syncSel(id); recalc(); });
-  });
-  ['pd-tr-cost','pd-ti-cost','pd-ho-cost'].forEach(id => {
+  /* Live recalc on input/checkbox change */
+  ['pm-tr-cost','pm-ti-cost','pm-ho-cost'].forEach(id => {
     document.getElementById(id).addEventListener('input', recalc);
+  });
+  ['pm-tr-booked','pm-ti-booked','pm-ho-booked'].forEach(id => {
+    document.getElementById(id).addEventListener('change', recalc);
   });
 
   /* ─────────────────────────────────────────────────────────────────────
@@ -1620,7 +1727,7 @@ function focusTrip(id) {
   ───────────────────────────────────────────────────────────────────── */
   saveBtn.addEventListener('click', () => {
     if (!curId) return;
-    save(curId, read());
+    savePlan(curId, read());
     refreshDots(curId);
     refreshSeasonBudget();
 
@@ -1632,22 +1739,18 @@ function focusTrip(id) {
   /* ─────────────────────────────────────────────────────────────────────
      Card booking dots
   ───────────────────────────────────────────────────────────────────── */
-  function dotRing(status) {
-    const cls = {booked:'c-dot__ring--booked',pending:'c-dot__ring--pending',na:'c-dot__ring--na'}[status]||'c-dot__ring--empty';
-    return `<span class="c-dot__ring ${cls}"></span>`;
-  }
-  function statusTip(s) {
-    return {booked:'Booked',pending:'Open',na:'Not relevant'}[s]||'Not set';
+  function dotRing(booked) {
+    return `<span class="c-dot__ring ${booked ? 'c-dot__ring--booked' : 'c-dot__ring--empty'}"></span>`;
   }
 
   function refreshDots(id) {
     const el = document.getElementById('dots-'+id);
     if (!el) return;
-    const d = load(id);
+    const d = loadPlan(id);
     el.innerHTML = `
-      <div class="c-dot" title="Travel: ${statusTip(d.travel.status)}">${dotRing(d.travel.status)}<span>Travel</span></div>
-      <div class="c-dot" title="Ticket: ${statusTip(d.ticket.status)}">${dotRing(d.ticket.status)}<span>Ticket</span></div>
-      <div class="c-dot" title="Hotel: ${statusTip(d.hotel.status)}">${dotRing(d.hotel.status)}<span>Hotel</span></div>
+      <div class="c-dot" title="Travel: ${d.travel.booked?'Booked':'Not set'}">${dotRing(d.travel.booked)}<span>Travel</span></div>
+      <div class="c-dot" title="Ticket: ${d.ticket.booked?'Booked':'Not set'}">${dotRing(d.ticket.booked)}<span>Ticket</span></div>
+      <div class="c-dot" title="Hotel: ${d.hotel.booked?'Booked':'Not set'}">${dotRing(d.hotel.booked)}<span>Hotel</span></div>
       <span class="card__dots-hint">click to plan →</span>`;
   }
 
@@ -1655,10 +1758,10 @@ function focusTrip(id) {
      Season budget stat (header)
   ───────────────────────────────────────────────────────────────────── */
   function refreshSeasonBudget() {
-    let booked=0;
-    TRIPS.forEach(t => { booked+=calcCosts(load(t.id)).booked; });
-    const el=document.getElementById('stat-season-budget');
-    if (el) el.textContent = booked>0 ? eur(booked) : '€ –';
+    let total = 0;
+    TRIPS.forEach(t => { total += calcTotal(loadPlan(t.id)); });
+    const el = document.getElementById('stat-season-budget');
+    if (el) el.textContent = total > 0 ? eur(total) : '€ –';
   }
 
   /* ─────────────────────────────────────────────────────────────────────
@@ -1776,6 +1879,369 @@ function focusTrip(id) {
 
   /* Fetch all, stagger slightly so we don't hammer the API */
   TRIPS.forEach((t, i) => setTimeout(() => fetchWeather(t), i * 120));
+}());
+
+/* ══ Smart Packing List (Tab 2) ════════════════════════════════════════════ */
+(function () {
+  const WX_TTL = 6 * 3600 * 1000;
+
+  function isoDate(d) { return d.toISOString().slice(0, 10); }
+
+  // ── Weather fetch with cache ──────────────────────────────────────────────
+  async function getWeather(trip) {
+    const key = 'weatherCache_' + trip.id;
+    try {
+      const c = JSON.parse(localStorage.getItem(key) || 'null');
+      if (c && (Date.now() - c.ts) < WX_TTL) return c.data;
+    } catch (_) {}
+
+    const away = daysTo(trip.start);
+    const base = [
+      'latitude=' + trip.lat, 'longitude=' + trip.lng,
+      'daily=temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weathercode',
+      'timezone=auto',
+    ].join('&');
+
+    let url;
+    if (away <= 16) {
+      url = 'https://api.open-meteo.com/v1/forecast?' + base +
+            '&start_date=' + isoDate(trip.start) + '&end_date=' + isoDate(trip.end);
+    } else {
+      const s = new Date(trip.start); s.setFullYear(s.getFullYear() - 1);
+      const e = new Date(trip.end);   e.setFullYear(e.getFullYear() - 1);
+      url = 'https://archive-api.open-meteo.com/v1/archive?' + base +
+            '&start_date=' + isoDate(s) + '&end_date=' + isoDate(e);
+    }
+
+    const json = await (await fetch(url)).json();
+    const d = json.daily;
+    if (!d || !d.time) return null;
+    const data = {
+      time: d.time, maxTemp: d.temperature_2m_max, minTemp: d.temperature_2m_min,
+      precip: d.precipitation_sum, precipPct: d.precipitation_probability_max, code: d.weathercode,
+    };
+    try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data })); } catch (_) {}
+    return data;
+  }
+
+  function wxEmoji(c) {
+    if (c <= 1) return '☀️'; if (c <= 3) return '⛅'; if (c <= 48) return '🌫️';
+    if (c <= 67) return '🌧️'; if (c <= 77) return '❄️'; if (c <= 82) return '🌦️';
+    return '⛈️';
+  }
+
+  // ── Item factory ──────────────────────────────────────────────────────────
+  function mk(tier, label, why, share) {
+    return { tier, label, why, share: !!share, id: label.toLowerCase().replace(/[^a-z0-9]+/g, '_') };
+  }
+
+  // ── Generate smart items ───────────────────────────────────────────────────
+  function generateItems(trip, plan, ctx, wx) {
+    const flying    = plan.travel && plan.travel.type === 'Flight';
+    const handOnly  = flying && ctx.luggage === 'hand';
+    const withDavid = ctx.companion === 'david';
+    const nights    = Number(plan.hotel && plan.hotel.nights) || 2;
+    const vip       = plan.ticket && plan.ticket.type === 'Hospitality';
+
+    const avgMax = wx ? wx.maxTemp.reduce((a, b) => a + b, 0) / wx.maxTemp.length : 22;
+    const avgMin = wx ? wx.minTemp.reduce((a, b) => a + b, 0) / wx.minTemp.length : 14;
+    const rain   = wx ? wx.precipPct.some(p => p > 40) || wx.precip.some(p => p > 3) : false;
+    const storm  = wx ? wx.code.some(c => c >= 95) : false;
+    const cold   = avgMin < 12;
+    const hot    = avgMax > 28;
+
+    const must = [], rec = [], opt = [];
+    const M = (l, w, s) => must.push(mk('must', l, w, s));
+    const R = (l, w, s) => rec.push(mk('rec',  l, w, s));
+    const O = (l, w, s) => opt.push(mk('opt',  l, w, s));
+
+    // Documents & essentials
+    M('Passport / ID', 'Required for international travel');
+    if (flying) M('Flight tickets (digital/print)', 'Need boarding pass at check-in');
+    M('Race tickets / passes', (plan.ticket ? plan.ticket.type : 'Ticket') + ' – bring confirmation');
+    M('Phone + charger', 'Navigation, tickets, live timing');
+    M('Wallet + cash + cards', 'Cards not always accepted at circuits');
+    M('Travel insurance card', 'EU card or credit card cover');
+    if (flying) R('Hotel confirmation (offline)', 'Screenshot or print in case of no signal');
+
+    // Clothing
+    M('Underwear × ' + (nights + 1), nights + ' nights + travel day');
+    M('Socks × ' + (nights + 1), 'One pair per day');
+    M('Jeans / trousers', 'Race days are long; circuits can be cool in the evening');
+    hot ? R('Shorts', 'Avg high ' + Math.round(avgMax) + '°C – likely needed')
+        : O('Shorts', 'In case it warms up');
+    M('T-shirts (2–3)', 'Race wear staple');
+    if (vip) M('Smart casual outfit', 'Hospitality paddock has an implicit dress code');
+
+    // Weather-driven clothing
+    if (storm) {
+      M('Rain jacket / poncho', 'Storms possible – ' + Math.round(Math.max(...wx.precipPct)) + '% rain chance');
+      R('Waterproof shoes / boots', 'Wet grass at circuits gets very muddy');
+    } else if (rain) {
+      M('Rain jacket / poncho', 'Rain forecast – up to ' + Math.round(Math.max(...wx.precipPct)) + '% chance');
+      R('Waterproof shoes', 'Wet grass at circuits gets muddy');
+    } else {
+      R('Light jacket', 'Evenings at circuits can be cool');
+    }
+    if (cold) {
+      M('Warm layer / fleece', 'Avg low ' + Math.round(avgMin) + '°C – exposed grandstands get cold');
+      R('Beanie / warm hat', 'Wind-chill on open grandstands');
+    }
+    if (hot) {
+      M('Sunscreen SPF 50+', 'Avg high ' + Math.round(avgMax) + '°C – hours in direct sun');
+      M('Sunglasses', 'Glare off tarmac and grandstands');
+      R('Cooling towel / fan', 'Helps in hot paddock queues');
+    } else {
+      R('Sunscreen SPF 30', 'Even overcast days have UV reflection off the track');
+      R('Sunglasses', 'Glare protection');
+    }
+
+    // Footwear
+    M('Comfortable walking shoes', 'You walk 10–15 km per race day');
+    if (rain) R('Spare dry shoes', 'Wet feet for 3 days = blisters and misery');
+
+    // Racetrack essentials
+    M('Ear protection / earplugs', 'Essential in standing areas – F1/MotoGP is extremely loud');
+    if (withDavid) M('Spare earplugs for David', 'He always forgets his', true);
+    R('Binoculars', 'Far corners and podium detail are worth it');
+    R('Small backpack / day bag', 'Carry food, rain gear, merch, camera');
+    if (handOnly) R('Packing cubes', 'Essential for fitting everything in a cabin bag', withDavid);
+
+    // Power & tech
+    M('Portable charger (10,000 mAh+)', 'F1 live timing and maps drain battery fast');
+    R('Headphones', 'F1 TV commentary via app is great trackside');
+    if (flying) O('Travel power adapter', trip.name + ' may use a different socket type');
+    O('Camera / GoPro', 'Especially if you have paddock or pit lane access');
+
+    // Food & drink
+    M('Refillable water bottle', 'Water is expensive / scarce inside most circuits');
+    R('Snacks / energy bars', 'Food queues are brutal on race day');
+
+    // Hygiene
+    M('Toiletries bag', 'Basics for ' + nights + ' nights');
+    if (handOnly) M('100ml liquids in clear bag', 'Hand baggage liquid rules are strictly enforced');
+    R('Blister plasters', 'Long days on hard tarmac = blisters');
+    R('Lip balm + hand cream', 'Wind and sun dry out skin fast outdoors');
+    O('Travel laundry tabs', nights > 4 ? 'Long trip – rewash saves space' : 'If travelling very light');
+
+    // Hospitality extras
+    if (vip) {
+      R('Business cards', 'Hospitality is a great networking environment');
+      O('Smart accessories (watch, etc.)', 'Paddock Club is as much social as sport');
+    }
+
+    const dedup = arr => {
+      const seen = new Set();
+      return arr.filter(x => { if (seen.has(x.id)) return false; seen.add(x.id); return true; });
+    };
+    return { must: dedup(must), rec: dedup(rec), opt: dedup(opt) };
+  }
+
+  // ── Persistence ───────────────────────────────────────────────────────────
+  function loadState(id) {
+    try { return JSON.parse(localStorage.getItem('packingList_' + id) || '{}'); } catch { return {}; }
+  }
+  function saveState(id, s) {
+    try { localStorage.setItem('packingList_' + id, JSON.stringify(s)); } catch (_) {}
+  }
+  function loadCtx(id) {
+    try { return JSON.parse(localStorage.getItem('packingCtx_' + id) || 'null'); } catch { return null; }
+  }
+  function saveCtx(id, ctx) {
+    try { localStorage.setItem('packingCtx_' + id, JSON.stringify(ctx)); } catch (_) {}
+  }
+
+  // ── HTML builders ─────────────────────────────────────────────────────────
+  function wxBarHTML(wx, daysAway) {
+    if (!wx) return '';
+    const notice = daysAway > 16
+      ? '<div class="pl-wx-notice">⚠️ Forecast not yet available — showing last year\'s weather as a reference</div>'
+      : '';
+    const days = wx.time.map((date, i) => {
+      const d = new Date(date + 'T12:00:00');
+      const lbl = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' });
+      const pct = (wx.precipPct && wx.precipPct[i] != null) ? wx.precipPct[i] : Math.round((wx.precip[i] || 0) * 10);
+      return '<div class="pl-wx-day"><span>' + lbl + '</span><span>' + wxEmoji(wx.code[i]) + '</span>' +
+             '<span>' + Math.round(wx.maxTemp[i]) + '°/' + Math.round(wx.minTemp[i]) + '°</span>' +
+             '<span>💧' + pct + '%</span></div>';
+    }).join('');
+    return notice + '<div class="pl-wx-bar">' + days + '</div><div class="pl-wx-sep"></div>';
+  }
+
+  function ctxHTML(id, ctx, flying) {
+    const B = (key, val, lbl) =>
+      '<button class="pl-ctx-btn' + (ctx[key] === val ? ' pl-ctx-btn--sky' : '') +
+      '" onclick="plCtx(\'' + id + '\',\'' + key + '\',\'' + val + '\')">' + lbl + '</button>';
+    return '<div class="pl-ctx">' +
+      '<div class="pl-ctx-title">Personalise your list</div>' +
+      '<div class="pl-ctx-row"><span class="pl-ctx-lbl">👥 Travelling with</span>' +
+      B('companion','solo','Solo') + B('companion','david','With David') + B('companion','group','Group') + '</div>' +
+      (flying ? '<div class="pl-ctx-row"><span class="pl-ctx-lbl">🧳 Luggage</span>' +
+        B('luggage','hand','Hand only') + B('luggage','checked','Checked bag') + '</div>' : '') +
+      '</div>';
+  }
+
+  function itemsHTML(sections, state, custom, id) {
+    const LABELS = { must: '🔴 Must-have', rec: '🟡 Recommended', opt: '⚪ Optional' };
+    let html = '';
+    ['must', 'rec', 'opt'].forEach(tier => {
+      const items = sections[tier];
+      if (!items || !items.length) return;
+      html += '<div class="pl-section"><div class="pl-sec-head">' + LABELS[tier] + '</div><ul class="pl-list">';
+      items.forEach(it => {
+        const chk   = state[it.id] ? ' checked' : '';
+        const share = it.share ? '<span class="pl-share" title="Shareable with David">👫</span>' : '';
+        html += '<li class="pl-item' + (state[it.id] ? ' checked' : '') + '">' +
+          '<input type="checkbox" class="pl-cb" id="plcb_' + it.id + '"' + chk +
+          ' onchange="plCheck(\'' + it.id + '\',this.checked)">' +
+          '<label class="pl-item-lbl" for="plcb_' + it.id + '">' + it.label + '</label>' +
+          '<span class="pl-icons">' + share +
+          '<span class="pl-info" tabindex="0">ℹ️<span class="pl-tt">' + it.why + '</span></span></span></li>';
+      });
+      html += '</ul></div>';
+    });
+    if (custom && custom.length) {
+      html += '<div class="pl-section"><div class="pl-sec-head">📌 Your items</div><ul class="pl-list">';
+      custom.forEach((lbl, i) => {
+        const cid = 'custom_' + i;
+        const chk = state[cid] ? ' checked' : '';
+        html += '<li class="pl-item pl-item--custom' + (state[cid] ? ' checked' : '') + '">' +
+          '<input type="checkbox" class="pl-cb" id="plcb_' + cid + '"' + chk +
+          ' onchange="plCheck(\'' + cid + '\',this.checked)">' +
+          '<label class="pl-item-lbl" for="plcb_' + cid + '">' + lbl + '</label>' +
+          '<span class="pl-icons"><button class="pl-del" onclick="plRemoveCustom(\'' + id + '\',' + i + ')" title="Remove">✕</button></span></li>';
+      });
+      html += '</ul></div>';
+    }
+    return html;
+  }
+
+  function actionsHTML(id) {
+    return '<div class="pl-actions">' +
+      '<button class="pl-btn" onclick="plReset(\'' + id + '\')">🔄 Reset</button>' +
+      '<button class="pl-btn" onclick="plCopy(\'' + id + '\')">📋 Copy</button>' +
+      '<button class="pl-btn" onclick="plRegenerate(\'' + id + '\')">🔁 Regen</button>' +
+      '</div>' +
+      '<div class="pl-add-form"><div class="pl-add-row">' +
+      '<input type="text" class="pm-inp" id="pl-add-inp-' + id + '" placeholder="Add item…"' +
+      ' onkeydown="if(event.key===\'Enter\')plSaveCustom(\'' + id + '\')">' +
+      '<button class="pl-add-btn" onclick="plSaveCustom(\'' + id + '\')">➕</button>' +
+      '</div></div>';
+  }
+
+  // ── Render state ──────────────────────────────────────────────────────────
+  let curPlId     = null;
+  let curSections = null;
+
+  // ── Main render ───────────────────────────────────────────────────────────
+  window.renderPackingTab = async function (id) {
+    curPlId = id;
+    const container = document.getElementById('pm-tab-packing');
+    if (!container) return;
+    container.innerHTML = '<div class="pl-loading">⏳ Building your packing list…</div>';
+
+    const trip = (TRIPS).find(x => x.id === id);
+    if (!trip) { container.innerHTML = '<div class="pl-loading">Trip not found.</div>'; return; }
+
+    const plan   = window.loadPlan ? window.loadPlan(id) : {};
+    const ctx    = loadCtx(id) || { companion: 'solo', luggage: 'checked' };
+    const state  = loadState(id);
+    const custom = state.__custom || [];
+    const away   = daysTo(trip.start);
+    const flying = plan.travel && plan.travel.type === 'Flight';
+
+    let wx = null;
+    try { wx = await getWeather(trip); } catch (_) {}
+
+    curSections = generateItems(trip, plan, ctx, wx);
+
+    container.innerHTML =
+      wxBarHTML(wx, away) +
+      ctxHTML(id, ctx, flying) +
+      itemsHTML(curSections, state, custom, id) +
+      actionsHTML(id);
+  };
+
+  // ── Global action handlers ────────────────────────────────────────────────
+  window.plCtx = function (id, key, val) {
+    const ctx = loadCtx(id) || { companion: 'solo', luggage: 'checked' };
+    ctx[key] = val;
+    saveCtx(id, ctx);
+    window.renderPackingTab(id);
+  };
+
+  window.plCheck = function (itemId, checked) {
+    if (!curPlId) return;
+    const state = loadState(curPlId);
+    state[itemId] = checked;
+    saveState(curPlId, state);
+    const cb = document.getElementById('plcb_' + itemId);
+    if (cb) cb.closest('.pl-item').classList.toggle('checked', checked);
+  };
+
+  window.plReset = function (id) {
+    const state  = loadState(id);
+    const custom = state.__custom || [];
+    saveState(id, { __custom: custom });
+    document.querySelectorAll('#pm-tab-packing .pl-cb').forEach(cb => {
+      cb.checked = false;
+      cb.closest('.pl-item').classList.remove('checked');
+    });
+  };
+
+  window.plSaveCustom = function (id) {
+    const inp = document.getElementById('pl-add-inp-' + id);
+    if (!inp) return;
+    const lbl = inp.value.trim();
+    if (!lbl) return;
+    const state  = loadState(id);
+    const custom = state.__custom || [];
+    custom.push(lbl);
+    state.__custom = custom;
+    saveState(id, state);
+    inp.value = '';
+    window.renderPackingTab(id);
+  };
+
+  window.plRemoveCustom = function (id, idx) {
+    const state  = loadState(id);
+    const custom = state.__custom || [];
+    for (let i = idx; i < custom.length - 1; i++) state['custom_' + i] = state['custom_' + (i + 1)];
+    delete state['custom_' + (custom.length - 1)];
+    custom.splice(idx, 1);
+    state.__custom = custom;
+    saveState(id, state);
+    window.renderPackingTab(id);
+  };
+
+  window.plCopy = function (id) {
+    if (!curSections) return;
+    const state  = loadState(id);
+    const custom = state.__custom || [];
+    const trip   = (TRIPS).find(x => x.id === id);
+    const lines  = ['📋 Packing list – ' + (trip ? trip.name : id), ''];
+    const LABELS = { must: '🔴 Must-have', rec: '🟡 Recommended', opt: '⚪ Optional' };
+    ['must', 'rec', 'opt'].forEach(tier => {
+      if (!curSections[tier].length) return;
+      lines.push(LABELS[tier]);
+      curSections[tier].forEach(it => lines.push((state[it.id] ? '✅' : '⬜') + ' ' + it.label));
+      lines.push('');
+    });
+    if (custom.length) {
+      lines.push('📌 Your items');
+      custom.forEach((lbl, i) => lines.push((state['custom_' + i] ? '✅' : '⬜') + ' ' + lbl));
+    }
+    navigator.clipboard.writeText(lines.join('\n')).then(() => {
+      const btn = document.querySelector('#pm-tab-packing .pl-btn[onclick*="plCopy"]');
+      if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => { btn.textContent = '📋 Copy'; }, 1800); }
+    });
+  };
+
+  window.plRegenerate = function (id) {
+    try { localStorage.removeItem('weatherCache_' + id); } catch (_) {}
+    window.renderPackingTab(id);
+  };
+
 }());
 </script>
 </body>
