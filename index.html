@@ -287,7 +287,7 @@
       display: flex;
       align-items: flex-start;
       gap: 0.5rem;
-      font-size: 0.875rem;
+      font-size: 0.93rem;
       color: var(--text2);
       line-height: 1.4;
     }
@@ -306,7 +306,7 @@
     }
     .card__hl-list { list-style: none; display: flex; flex-direction: column; gap: 0.38rem; }
     .card__hl-list li {
-      font-size: 0.84rem;
+      font-size: 0.875rem;
       color: var(--text2);
       padding-left: 1.15rem;
       position: relative;
@@ -666,6 +666,7 @@
     .pd-sel--status[data-v="booked"]  { border-color: #4ade80; background: #f0fdf4; color: #15803d; }
     .pd-sel--status[data-v="pending"] { border-color: #fbbf24; background: #fffbeb; color: #92400e; }
     .pd-sel--status[data-v="na"]      { background: var(--grey-soft); color: var(--muted); }
+    .pd-sel--status-sm { min-width: 0; width: 115px; }
     .pd-inp--txt   { flex: 1; min-width: 110px; }
     .pd-inp--num   { width: 72px; flex-shrink: 0; text-align: right; }
     .pd-inp--nights{ width: 56px; flex-shrink: 0; text-align: right; }
@@ -759,7 +760,7 @@
       <div class="stat"><span class="stat__val">5</span><span class="stat__lbl">F1 Grands Prix</span></div>
       <div class="stat"><span class="stat__val">1</span><span class="stat__lbl">MotoGP round</span></div>
       <div class="stat"><span class="stat__val">1</span><span class="stat__lbl">DTM round</span></div>
-      <div class="stat stat--budget"><span class="stat__val" id="stat-season-budget">€ –</span><span class="stat__lbl">gebucht</span></div>
+      <div class="stat stat--budget"><span class="stat__val" id="stat-season-budget">€ –</span><span class="stat__lbl">booked</span></div>
     </div>
   </div>
 </header>
@@ -786,7 +787,7 @@
 
 <!-- ════ PLANNING DRAWER ════ -->
 <div id="pd-overlay" class="pd-overlay" aria-hidden="true">
-  <div class="pd-drawer" role="dialog" aria-label="Trip planen">
+  <div class="pd-drawer" role="dialog" aria-label="Plan trip">
 
     <div class="pd-header" id="pd-header">
       <div class="pd-trip-info">
@@ -796,21 +797,21 @@
           <div class="pd-dates-lbl" id="pd-dates-lbl"></div>
         </div>
       </div>
-      <button class="pd-close" id="pd-close" aria-label="Schließen">✕</button>
+      <button class="pd-close" id="pd-close" aria-label="Close">✕</button>
     </div>
 
     <div class="pd-body">
 
-      <!-- Anreise -->
+      <!-- Travel -->
       <div class="pd-sec">
-        <div class="pd-sec-head">🚗 Anreise</div>
+        <div class="pd-sec-head">🚗 Travel</div>
         <div class="pd-sec-body">
           <div class="pd-row">
-            <span class="pd-lbl">Typ</span>
+            <span class="pd-lbl">Type</span>
             <select class="pd-sel" id="pd-tr-type">
-              <option value="Auto">Auto</option>
-              <option value="Flug">Flug</option>
-              <option value="Zug">Zug</option>
+              <option value="Car">Car</option>
+              <option value="Flight">Flight</option>
+              <option value="Train">Train</option>
               <option value="Bus">Bus</option>
             </select>
           </div>
@@ -818,43 +819,43 @@
             <span class="pd-lbl">Status</span>
             <select class="pd-sel pd-sel--status" id="pd-tr-status">
               <option value="">– Status –</option>
-              <option value="booked">✅ Gebucht</option>
-              <option value="pending">🟡 Offen</option>
-              <option value="na">⬜ Nicht relevant</option>
+              <option value="booked">✅ Booked</option>
+              <option value="pending">🟡 Open</option>
+              <option value="na">⬜ Not relevant</option>
             </select>
           </div>
           <div class="pd-row">
-            <span class="pd-lbl">Kosten</span>
+            <span class="pd-lbl">Cost</span>
             <span class="pd-eur">€</span>
             <input type="number" class="pd-inp pd-inp--num" id="pd-tr-cost" min="0" step="1" placeholder="0">
           </div>
         </div>
       </div>
 
-      <!-- Event-Ticket -->
+      <!-- Ticket -->
       <div class="pd-sec">
-        <div class="pd-sec-head">🎫 Event-Ticket</div>
+        <div class="pd-sec-head">🎫 Ticket</div>
         <div class="pd-sec-body">
           <div class="pd-row">
-            <span class="pd-lbl">Typ</span>
+            <span class="pd-lbl">Type</span>
             <select class="pd-sel" id="pd-ti-type">
               <option value="Hospitality">Hospitality</option>
               <option value="Grandstand">Grandstand</option>
-              <option value="Supercup-Pass">Supercup-Pass</option>
-              <option value="Paddock-Club">Paddock-Club</option>
+              <option value="Supercup Pass">Supercup Pass</option>
+              <option value="Paddock Club">Paddock Club</option>
             </select>
           </div>
           <div class="pd-row">
             <span class="pd-lbl">Status</span>
             <select class="pd-sel pd-sel--status" id="pd-ti-status">
               <option value="">– Status –</option>
-              <option value="booked">✅ Gebucht</option>
-              <option value="pending">🟡 Offen</option>
-              <option value="na">⬜ Nicht relevant</option>
+              <option value="booked">✅ Booked</option>
+              <option value="pending">🟡 Open</option>
+              <option value="na">⬜ Not relevant</option>
             </select>
           </div>
           <div class="pd-row">
-            <span class="pd-lbl">Kosten</span>
+            <span class="pd-lbl">Cost</span>
             <span class="pd-eur">€</span>
             <input type="number" class="pd-inp pd-inp--num" id="pd-ti-cost" min="0" step="1" placeholder="0">
           </div>
@@ -867,32 +868,32 @@
         <div class="pd-sec-body">
           <div class="pd-row">
             <span class="pd-lbl">Name</span>
-            <input type="text" class="pd-inp pd-inp--txt" id="pd-ho-name" placeholder="Hotelname">
+            <input type="text" class="pd-inp pd-inp--txt" id="pd-ho-name" placeholder="Hotel name">
           </div>
           <div class="pd-row">
-            <span class="pd-lbl">Nächte</span>
+            <span class="pd-lbl">Nights</span>
             <input type="number" class="pd-inp pd-inp--nights" id="pd-ho-nights" min="1" step="1" placeholder="2">
           </div>
           <div class="pd-row">
             <span class="pd-lbl">Status</span>
             <select class="pd-sel pd-sel--status" id="pd-ho-status">
               <option value="">– Status –</option>
-              <option value="booked">✅ Gebucht</option>
-              <option value="pending">🟡 Offen</option>
-              <option value="na">⬜ Nicht relevant</option>
+              <option value="booked">✅ Booked</option>
+              <option value="pending">🟡 Open</option>
+              <option value="na">⬜ Not relevant</option>
             </select>
           </div>
           <div class="pd-row">
-            <span class="pd-lbl">Kosten ges.</span>
+            <span class="pd-lbl">Total cost</span>
             <span class="pd-eur">€</span>
             <input type="number" class="pd-inp pd-inp--num" id="pd-ho-cost" min="0" step="1" placeholder="0">
           </div>
         </div>
       </div>
 
-      <!-- Sonstiges -->
+      <!-- Other -->
       <div class="pd-sec">
-        <div class="pd-sec-head">📝 Sonstiges</div>
+        <div class="pd-sec-head">📝 Other</div>
         <div class="pd-sec-body" id="pd-extras"></div>
       </div>
 
@@ -900,14 +901,14 @@
 
     <div class="pd-footer">
       <div class="pd-cost-row pd-cost-row--total">
-        <span>Gesamtkosten Trip</span>
+        <span>Total trip cost</span>
         <span class="pd-amount" id="pd-total">€ 0</span>
       </div>
       <div class="pd-cost-row pd-cost-row--booked">
-        <span>davon gebucht</span>
+        <span>of which booked</span>
         <span class="pd-amount" id="pd-booked">€ 0</span>
       </div>
-      <button class="pd-btn-save" id="pd-btn-save">💾 Speichern</button>
+      <button class="pd-btn-save" id="pd-btn-save">💾 Save</button>
     </div>
 
   </div>
@@ -1278,10 +1279,10 @@ function isActive(i) { return STATUSES[i] === 'active'; }
       ${contHtml}
       <div id="wx-${t.id}" class="card__wx"><div class="card__wx-loading">Loading forecast…</div></div>
       <div id="dots-${t.id}" class="card__dots">
-        <div class="c-dot"><span class="c-dot__ring c-dot__ring--empty"></span>Anreise</div>
+        <div class="c-dot"><span class="c-dot__ring c-dot__ring--empty"></span>Travel</div>
         <div class="c-dot"><span class="c-dot__ring c-dot__ring--empty"></span>Ticket</div>
         <div class="c-dot"><span class="c-dot__ring c-dot__ring--empty"></span>Hotel</div>
-        <span class="card__dots-hint">klicken zum planen →</span>
+        <span class="card__dots-hint">click to plan →</span>
       </div>
     `;
 
@@ -1499,10 +1500,10 @@ function focusTrip(id) {
   ───────────────────────────────────────────────────────────────────── */
   function defaultData() {
     return {
-      travel: { type:'Auto',        status:'', cost:'' },
+      travel: { type:'Car',         status:'', cost:'' },
       ticket: { type:'Hospitality', status:'', cost:'' },
       hotel:  { name:'', nights:'', status:'', cost:'' },
-      extras: [{label:'',cost:''},{label:'',cost:''},{label:'',cost:''}],
+      extras: [{label:'',cost:'',status:''},{label:'',cost:'',status:''},{label:'',cost:'',status:''}],
     };
   }
 
@@ -1540,10 +1541,20 @@ function focusTrip(id) {
       row.className = 'pd-extra-row';
       row.innerHTML = `
         <input type="text"   class="pd-inp pd-inp--txt" id="pd-ex-lbl-${i}"
-               placeholder="z.B. Parkplatz, Dinner…" value="${esc(ex.label)}">
+               placeholder="e.g. Parking, Dinner…" value="${esc(ex.label)}">
+        <select class="pd-sel pd-sel--status pd-sel--status-sm" id="pd-ex-status-${i}">
+          <option value="">–</option>
+          <option value="booked">✅ Booked</option>
+          <option value="pending">🟡 Open</option>
+          <option value="na">⬜ N/A</option>
+        </select>
         <span class="pd-eur">€</span>
         <input type="number" class="pd-inp pd-inp--num" id="pd-ex-cost-${i}"
                min="0" step="1" placeholder="0" value="${esc(ex.cost)}">`;
+      const selEl = row.querySelector(`#pd-ex-status-${i}`);
+      selEl.value = ex.status || '';
+      selEl.dataset.v = selEl.value;
+      selEl.addEventListener('change', function() { this.dataset.v = this.value; recalc(); });
       row.querySelectorAll('input').forEach(inp => inp.addEventListener('input', recalc));
       box.appendChild(row);
     });
@@ -1555,7 +1566,7 @@ function focusTrip(id) {
       ticket: { type: gv('pd-ti-type'), status: gv('pd-ti-status'), cost: nv('pd-ti-cost') },
       hotel:  { name: gv('pd-ho-name'), nights: nv('pd-ho-nights'),
                 status: gv('pd-ho-status'), cost: nv('pd-ho-cost') },
-      extras: [0,1,2].map(i => ({ label: gv(`pd-ex-lbl-${i}`), cost: nv(`pd-ex-cost-${i}`) })),
+      extras: [0,1,2].map(i => ({ label: gv(`pd-ex-lbl-${i}`), cost: nv(`pd-ex-cost-${i}`), status: gv(`pd-ex-status-${i}`) })),
     };
   }
 
@@ -1583,7 +1594,10 @@ function focusTrip(id) {
       const c=Number(cost)||0; total+=c;
       if(status==='booked') booked+=c;
     });
-    (d.extras||[]).forEach(ex => { total+=Number(ex.cost)||0; });
+    (d.extras||[]).forEach(ex => {
+      const c=Number(ex.cost)||0; total+=c;
+      if(ex.status==='booked') booked+=c;
+    });
     return {total,booked};
   }
 
@@ -1610,9 +1624,9 @@ function focusTrip(id) {
     refreshDots(curId);
     refreshSeasonBudget();
 
-    saveBtn.textContent='✓ Gespeichert';
+    saveBtn.textContent='✓ Saved';
     saveBtn.classList.add('saved');
-    setTimeout(()=>{ saveBtn.textContent='💾 Speichern'; saveBtn.classList.remove('saved'); }, 1600);
+    setTimeout(()=>{ saveBtn.textContent='💾 Save'; saveBtn.classList.remove('saved'); }, 1600);
   });
 
   /* ─────────────────────────────────────────────────────────────────────
@@ -1623,7 +1637,7 @@ function focusTrip(id) {
     return `<span class="c-dot__ring ${cls}"></span>`;
   }
   function statusTip(s) {
-    return {booked:'Gebucht',pending:'Offen',na:'Nicht relevant'}[s]||'Nicht gesetzt';
+    return {booked:'Booked',pending:'Open',na:'Not relevant'}[s]||'Not set';
   }
 
   function refreshDots(id) {
@@ -1631,10 +1645,10 @@ function focusTrip(id) {
     if (!el) return;
     const d = load(id);
     el.innerHTML = `
-      <div class="c-dot" title="Anreise: ${statusTip(d.travel.status)}">${dotRing(d.travel.status)}<span>Anreise</span></div>
+      <div class="c-dot" title="Travel: ${statusTip(d.travel.status)}">${dotRing(d.travel.status)}<span>Travel</span></div>
       <div class="c-dot" title="Ticket: ${statusTip(d.ticket.status)}">${dotRing(d.ticket.status)}<span>Ticket</span></div>
       <div class="c-dot" title="Hotel: ${statusTip(d.hotel.status)}">${dotRing(d.hotel.status)}<span>Hotel</span></div>
-      <span class="card__dots-hint">klicken zum planen →</span>`;
+      <span class="card__dots-hint">click to plan →</span>`;
   }
 
   /* ─────────────────────────────────────────────────────────────────────
