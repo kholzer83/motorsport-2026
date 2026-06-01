@@ -741,19 +741,23 @@
       border-top: 1px solid var(--divider);
     }
     .c-dot {
-      display: flex; align-items: center; gap: 0.3rem;
-      font-size: 0.68rem; color: var(--muted);
+      display: flex; align-items: center; gap: 0.35rem;
+      font-size: 0.875rem; color: var(--text2);
     }
     .c-dot__ring {
-      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+      width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
     }
     .c-dot__ring--booked  { background: #4ade80; }
     .c-dot__ring--pending { background: #fbbf24; }
     .c-dot__ring--na      { background: #d1d5db; }
     .c-dot__ring--empty   { background: transparent; border: 1.5px dashed #d1d5db; }
+    .card__dots-cost {
+      font-size: 0.875rem; font-weight: 600; color: var(--text);
+      margin-left: 0.6rem;
+    }
     .card__dots-hint {
       margin-left: auto;
-      font-size: 0.67rem; color: var(--muted);
+      font-size: 0.8rem; color: var(--muted);
       font-style: italic;
     }
 
@@ -1746,10 +1750,15 @@ function focusTrip(id) {
     const el = document.getElementById('dots-'+id);
     if (!el) return;
     const d = loadPlan(id);
+    const total = calcTotal(d);
+    const costSpan = total > 0
+      ? `<span class="card__dots-cost">${eur(total)}</span>`
+      : '';
     el.innerHTML = `
       <div class="c-dot" title="Travel: ${d.travel.booked?'Booked':'Not set'}">${dotRing(d.travel.booked)}<span>Travel</span></div>
       <div class="c-dot" title="Ticket: ${d.ticket.booked?'Booked':'Not set'}">${dotRing(d.ticket.booked)}<span>Ticket</span></div>
       <div class="c-dot" title="Hotel: ${d.hotel.booked?'Booked':'Not set'}">${dotRing(d.hotel.booked)}<span>Hotel</span></div>
+      ${costSpan}
       <span class="card__dots-hint">click to plan →</span>`;
   }
 
