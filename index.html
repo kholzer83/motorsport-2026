@@ -857,17 +857,15 @@
     .pl-add-btn:hover { background:#a855f7; }
 
     /* ─── Responsive ─── */
-    /* Sync button */
-    .hdr__sync { margin-top: 0.9rem; }
-    .sync-btn {
-      font-family: var(--font); font-size: 0.76rem;
-      padding: 0.32rem 0.75rem;
-      border: 1.5px solid var(--border); border-radius: var(--r-pill);
-      background: var(--card); color: var(--text2); cursor: pointer;
-      transition: border-color 0.14s, color 0.14s;
+    /* Sync status */
+    .hdr__sync { margin-top: 0.75rem; }
+    .sync-status {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.73rem; color: var(--muted);
     }
-    .sync-btn:hover { border-color: var(--lav); color: var(--lav); }
-    .sync-btn.copied { border-color: #4ade80; color: #15803d; }
+    .sync-status--synced  { color: #15803d; }
+    .sync-status--syncing { color: var(--lav); }
+    .sync-status--offline { color: #dc2626; }
 
     @media (max-width: 640px) {
       .hdr            { padding: 2rem 1rem 2rem; }
@@ -905,7 +903,7 @@
       <div class="stat"><span class="stat__val">1</span><span class="stat__lbl">DTM round</span></div>
     </div>
     <div class="hdr__sync">
-      <button class="sync-btn" id="sync-btn" onclick="syncCopy()">📤 Copy sync link</button>
+      <span class="sync-status" id="sync-status">☁️ Connecting…</span>
     </div>
   </div>
 </header>
@@ -1063,51 +1061,89 @@
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <script>
 'use strict';
 
-/* ══ Device sync via URL hash ═══════════════════════════════════════════════
-   Copy sync link on device A → open on device B → data auto-imports.      */
+/* ══ Firebase Firestore Sync ════════════════════════════════════════════════ */
 (function () {
-  const HASH_PREFIX = '#sync=';
-  if (!location.hash.startsWith(HASH_PREFIX)) return;
-  try {
-    const encoded = location.hash.slice(HASH_PREFIX.length);
-    const json    = decodeURIComponent(escape(atob(encoded)));
-    const data    = JSON.parse(json);
-    Object.entries(data).forEach(([k, v]) => {
-      localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
-    });
-    history.replaceState(null, '', location.pathname + location.search);
-    location.reload();
-  } catch (_) {}
-}());
-
-window.syncCopy = function () {
-  const data = {};
-  ['tripPlan_', 'packingList_', 'packingCtx_'].forEach(prefix => {
-    Object.keys(localStorage)
-      .filter(k => k.startsWith(prefix))
-      .forEach(k => {
-        try { data[k] = JSON.parse(localStorage.getItem(k)); } catch (_) {}
-      });
-  });
-  if (!Object.keys(data).length) {
-    const btn = document.getElementById('sync-btn');
-    if (btn) { btn.textContent = '⚠️ Nothing saved yet'; setTimeout(() => { btn.textContent = '📤 Copy sync link'; }, 2000); }
-    return;
+  function setStatus(state, text) {
+    const el = document.getElementById('sync-status');
+    if (!el) return;
+    const labels = { synced:'☁️ Synced', syncing:'🔄 Syncing…', offline:'📴 Offline', error:'⚠️ Sync error' };
+    el.textContent = text || labels[state] || '';
+    el.className   = 'sync-status sync-status--' + state;
   }
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  const url     = location.href.split('#')[0] + '#sync=' + encoded;
-  navigator.clipboard.writeText(url).then(() => {
-    const btn = document.getElementById('sync-btn');
-    if (btn) {
-      btn.textContent = '✓ Link copied!';
-      btn.classList.add('copied');
-      setTimeout(() => { btn.textContent = '📤 Copy sync link'; btn.classList.remove('copied'); }, 2500);
-    }
-  });
-};
+
+  if (typeof firebase === 'undefined') { setStatus('offline'); return; }
+
+  try {
+    firebase.initializeApp({
+      apiKey:            'AIzaSyCKpc79WMHKzwIUSfAVJpmnEnaIKbH_3zY',
+      authDomain:        'motorsport-2026.firebaseapp.com',
+      projectId:         'motorsport-2026',
+      storageBucket:     'motorsport-2026.firebasestorage.app',
+      messagingSenderId: '643040586208',
+      appId:             '1:643040586208:web:9497a868916293e5826385',
+    });
+  } catch (e) {
+    if (!/already exists/.test(e.message)) { setStatus('error'); return; }
+  }
+
+  const db = firebase.firestore();
+
+  /* ── Save helpers ──────────────────────────────────────────────────────── */
+  window.fbSavePlan = async function (id, data) {
+    setStatus('syncing');
+    try {
+      await db.collection('plans').doc(String(id)).set(data);
+      setStatus('synced');
+    } catch (e) { console.warn('[FB]', e); setStatus('error'); }
+  };
+
+  const _packTimers = {};
+  window.fbSavePacking = function (id) {
+    clearTimeout(_packTimers[id]);
+    _packTimers[id] = setTimeout(async () => {
+      try {
+        const state = JSON.parse(localStorage.getItem('packingList_' + id) || '{}');
+        const ctx   = JSON.parse(localStorage.getItem('packingCtx_'   + id) || '{}');
+        await db.collection('packing').doc(String(id)).set({ state, ctx });
+      } catch (e) { console.warn('[FB packing]', e); }
+    }, 1500);
+  };
+
+  /* ── Real-time listeners ────────────────────────────────────────────────── */
+  db.collection('plans').onSnapshot(snap => {
+    snap.docChanges().forEach(ch => {
+      if (ch.type === 'removed') return;
+      const id   = Number(ch.doc.id);
+      if (isNaN(id)) return;
+      const data = ch.doc.data();
+      localStorage.setItem('tripPlan_' + id, JSON.stringify(data));
+      if (typeof refreshDots === 'function') refreshDots(id);
+      if (window.curOpenId == id) {
+        if (typeof fill === 'function') fill(data);
+        if (typeof recalc === 'function') recalc();
+      }
+    });
+    setStatus('synced');
+  }, () => setStatus('offline'));
+
+  db.collection('packing').onSnapshot(snap => {
+    snap.docChanges().forEach(ch => {
+      if (ch.type === 'removed') return;
+      const id = Number(ch.doc.id);
+      if (isNaN(id)) return;
+      const d  = ch.doc.data();
+      if (d.state) localStorage.setItem('packingList_' + id, JSON.stringify(d.state));
+      if (d.ctx)   localStorage.setItem('packingCtx_'  + id, JSON.stringify(d.ctx));
+      if (window.curPlId == id && typeof renderPackingTab === 'function') renderPackingTab(id);
+    });
+  }, () => {});
+
+}());
 
 /* ══ Trip data ══════════════════════════════════════════════════════════ */
 const TRIPS = [
@@ -1652,6 +1688,7 @@ function focusTrip(id) {
     ov.classList.add('open');
     ov.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+    window.curOpenId = id;
   };
 
   function closeModal() {
@@ -1659,6 +1696,7 @@ function focusTrip(id) {
     ov.setAttribute('aria-hidden', 'true');
     document.body.style.overflow = '';
     curId = null;
+    window.curOpenId = null;
   }
 
   function switchTab(tab) {
@@ -1789,7 +1827,9 @@ function focusTrip(id) {
   ───────────────────────────────────────────────────────────────────── */
   saveBtn.addEventListener('click', () => {
     if (!curId) return;
-    savePlan(curId, read());
+    const data = read();
+    savePlan(curId, data);
+    if (window.fbSavePlan) window.fbSavePlan(curId, data);
     refreshDots(curId);
     refreshSeasonBudget();
 
@@ -2234,6 +2274,7 @@ function focusTrip(id) {
     const ctx = loadCtx(id) || { companion: 'solo', luggage: 'checked' };
     ctx[key] = val;
     saveCtx(id, ctx);
+    if (window.fbSavePacking) window.fbSavePacking(id);
     window.renderPackingTab(id);
   };
 
@@ -2242,6 +2283,7 @@ function focusTrip(id) {
     const state = loadState(curPlId);
     state[itemId] = checked;
     saveState(curPlId, state);
+    if (window.fbSavePacking) window.fbSavePacking(curPlId);
     const cb = document.getElementById('plcb_' + itemId);
     if (cb) cb.closest('.pl-item').classList.toggle('checked', checked);
   };
@@ -2250,6 +2292,7 @@ function focusTrip(id) {
     const state  = loadState(id);
     const custom = state.__custom || [];
     saveState(id, { __custom: custom });
+    if (window.fbSavePacking) window.fbSavePacking(id);
     document.querySelectorAll('#pm-tab-packing .pl-cb').forEach(cb => {
       cb.checked = false;
       cb.closest('.pl-item').classList.remove('checked');
