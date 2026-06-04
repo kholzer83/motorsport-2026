@@ -100,43 +100,47 @@
     .hdr__badge {
       display: inline-flex;
       flex-direction: column;
-      gap: 0.75rem;
-      padding: 1rem 1.5rem 1.1rem;
-      background: rgba(255,255,255,0.11);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1.5px solid rgba(255,255,255,0.25);
+      gap: 0.6rem;
+      align-self: flex-start;
       color: #fff;
-      border-radius: 1.1rem;
+    }
+    .hdr__badge--done  { color: #bbf7d0; }
+    .hdr__badge-name {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.36rem 0.85rem;
+      background: rgba(255,255,255,0.13);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: var(--r-pill);
+      font-size: 0.82rem; font-weight: 400;
       align-self: flex-start;
     }
-    .hdr__badge--live  { background: rgba(249,115,22,0.55); border-color: rgba(249,115,22,0.45); }
-    .hdr__badge--done  { background: rgba(134,239,172,0.12); border-color: rgba(134,239,172,0.3); color:#bbf7d0; }
-    .hdr__badge-name {
-      display: flex; align-items: center; gap: 0.45rem;
-      font-size: 0.82rem; font-weight: 400; opacity: 0.72; letter-spacing: 0.01em;
-    }
+    .hdr__badge--live .hdr__badge-name  { background: rgba(249,115,22,0.45); border-color: rgba(249,115,22,0.4); }
+    .hdr__badge--done .hdr__badge-name  { background: rgba(134,239,172,0.12); border-color: rgba(134,239,172,0.25); }
     .hdr__cds {
-      display: flex; align-items: center; gap: 1.1rem;
+      display: flex; align-items: flex-end; gap: 1.5rem; padding-left: 0.2rem;
     }
     .hdr__cd {
-      display: flex; flex-direction: column; align-items: center; gap: 0.1rem; min-width: 72px;
+      display: flex; flex-direction: column; gap: 0.05rem;
     }
     .hdr__cd-num {
-      font-size: 2.6rem; font-weight: 700; line-height: 1;
-      letter-spacing: -0.05em;
+      font-size: 2rem; font-weight: 700; line-height: 1;
+      letter-spacing: -0.04em;
+      text-shadow: 0 1px 12px rgba(0,0,0,0.4);
     }
     .hdr__cd-lbl {
-      font-size: 0.65rem; opacity: 0.65; font-weight: 400;
-      text-transform: uppercase; letter-spacing: 0.08em; text-align: center;
+      font-size: 0.62rem; color: rgba(255,255,255,0.55);
+      text-transform: uppercase; letter-spacing: 0.09em; font-weight: 400;
     }
     .hdr__cd-sep {
-      width: 1px; height: 44px; background: rgba(255,255,255,0.22); flex-shrink: 0;
+      width: 1px; height: 28px; background: rgba(255,255,255,0.2);
+      align-self: center; flex-shrink: 0;
     }
     .badge-dot {
-      width: 7px; height: 7px;
+      width: 6px; height: 6px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.9);
+      background: rgba(255,255,255,0.85);
       animation: blink 1.4s ease-in-out infinite;
       flex-shrink: 0;
     }
