@@ -344,6 +344,23 @@
       line-height: 1.6;
     }
 
+    /* Race schedule */
+    .card__sched { margin-top: 0.85rem; display: flex; flex-direction: column; gap: 0; }
+    .card__sched-lbl {
+      font-size: 0.62rem; font-weight: 500; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 0.35rem;
+    }
+    .card__sched-row {
+      display: flex; align-items: baseline; gap: 0.5rem;
+      padding: 0.3rem 0; border-bottom: 1px solid var(--divider);
+      font-size: 0.8rem;
+    }
+    .card__sched-row:last-child { border-bottom: none; }
+    .card__sched-day  { color: var(--muted); font-size: 0.72rem; min-width: 56px; flex-shrink: 0; }
+    .card__sched-name { color: var(--text2); flex: 1; }
+    .card__sched-time { color: var(--text); font-weight: 600; font-variant-numeric: tabular-nums; }
+    .card__sched-time--tba { color: var(--muted); font-weight: 400; font-style: italic; }
+
     /* Special note banner */
     .card__special {
       margin-top: 0.85rem;
@@ -1208,6 +1225,10 @@ const TRIPS = [
     highlights: [
       'Friday or Saturday evening: Super Panda Circus speakeasy bar (our favourite! 🍹)',
     ],
+    schedule: [
+      { day: 'Sa 20.06', label: 'MotoGP Sprint', time: '15:00' },
+      { day: 'So 21.06', label: 'MotoGP Race',   time: '14:00' },
+    ],
     specialNote: null,
     continuation: null,
   },
@@ -1229,6 +1250,10 @@ const TRIPS = [
     who: 'Karin & David + Jean Michel & Benjamin joining Thursday',
     highlights: [
       'Thursday dinner: Restaurant Perschler with Jean Michel & Benjamin 🍽️',
+    ],
+    schedule: [
+      { day: 'So 28.06', label: 'Porsche Supercup Race', time: '11:55' },
+      { day: 'So 28.06', label: 'F1 Race',               time: '15:00' },
     ],
     specialNote: null,
     continuation: null,
@@ -1254,6 +1279,10 @@ const TRIPS = [
       'Sunday evening: drive to Tegernsee → AK CARO & SELIG (lakeside treat! 🌅)',
       'Monday: Karin takes train Innsbruck → Vienna, David drives home to Cittadella',
     ],
+    schedule: [
+      { day: 'Sa 04.07', label: 'Porsche Carrera Cup Race 1', time: '11:20' },
+      { day: 'So 05.07', label: 'Porsche Carrera Cup Race 2', time: '11:15' },
+    ],
     specialNote: null,
     continuation: null,
   },
@@ -1277,6 +1306,10 @@ const TRIPS = [
       'Saturday evening: drinks (optional) 🥂',
       'Monday after race: drive to Spielberg → stay at Schönberghof at Red Bull Ring',
       'Tuesday: David does KTM X-Bow track day at the circuit! 🏎️',
+    ],
+    schedule: [
+      { day: 'So 26.07', label: 'Porsche Supercup Race', time: '11:55' },
+      { day: 'So 26.07', label: 'F1 Race',               time: '15:00' },
     ],
     specialNote: null,
     continuation: null,
@@ -1302,6 +1335,11 @@ const TRIPS = [
       'Tuesday morning: early flight home ✈️',
       '⚑ This is the LAST EVER Dutch Grand Prix at Zandvoort!',
     ],
+    schedule: [
+      { day: 'Sa 22.08', label: 'Porsche Supercup Race 1', time: 'TBA' },
+      { day: 'So 23.08', label: 'Porsche Supercup Race 2', time: '11:55' },
+      { day: 'So 23.08', label: 'F1 Race',                 time: '15:00' },
+    ],
     specialNote: 'The last Dutch Grand Prix ever held at Zandvoort — a piece of history! 🏆',
     continuation: null,
   },
@@ -1325,6 +1363,10 @@ const TRIPS = [
       'Thursday evening: pizza dinner with Mark, Jean Michel & Benjamin 🍕',
       'Saturday: optional group dinner again 🍝',
       'After race: fly Milan → Faro → W Hotel Algarve (stay until Thursday) 🌊',
+    ],
+    schedule: [
+      { day: 'So 06.09', label: 'Porsche Supercup Race', time: '11:55' },
+      { day: 'So 06.09', label: 'F1 Race',               time: '15:00' },
     ],
     specialNote: null,
     continuation: { arrow: '→', label: 'Continues to Algarve & Madrid Spanish GP' },
@@ -1350,6 +1392,9 @@ const TRIPS = [
       'Full group weekend with Tom, Kris & John 🎉',
       'Monday: all fly home from same airport ✈️',
       '🆕 Brand new circuit – Madrid\'s debut on the F1 calendar!',
+    ],
+    schedule: [
+      { day: 'So 13.09', label: 'F1 Race', time: '15:00' },
     ],
     specialNote: 'Brand new circuit — Madrid\'s debut on the Formula 1 calendar! 🆕',
     continuation: { arrow: '←', label: 'Continued from Monza via Algarve' },
@@ -1497,6 +1542,18 @@ function isActive(i) { return STATUSES[i] === 'active'; }
     /* Highlights */
     const hlItems = t.highlights.map(h => `<li>${h}</li>`).join('');
 
+    /* Schedule */
+    const schedHtml = (t.schedule && t.schedule.length) ? `
+      <div class="card__sched">
+        <div class="card__sched-lbl">🏁 Race Schedule</div>
+        ${t.schedule.map(s => `
+          <div class="card__sched-row">
+            <span class="card__sched-day">${s.day}</span>
+            <span class="card__sched-name">${s.label}</span>
+            <span class="card__sched-time${s.time==='TBA'?' card__sched-time--tba':''}">${s.time}</span>
+          </div>`).join('')}
+      </div>` : '';
+
     /* Special note */
     const specialHtml = t.specialNote
       ? `<div class="card__special">${t.specialNote}</div>`
@@ -1551,6 +1608,7 @@ function isActive(i) { return STATUSES[i] === 'active'; }
       <div class="card__hl-lbl">✨ Highlights</div>
       <ul class="card__hl-list">${hlItems}</ul>
 
+      ${schedHtml}
       ${specialHtml}
       ${contHtml}
       <div id="wx-${t.id}" class="card__wx"><div class="card__wx-loading">Loading forecast…</div></div>
