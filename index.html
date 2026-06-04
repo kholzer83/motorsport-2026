@@ -855,6 +855,17 @@
       font-size:0.8rem; cursor:pointer; flex-shrink:0; transition:background 0.14s;
     }
     .pl-add-btn:hover { background:#a855f7; }
+    /* Progress bar */
+    .pl-progress { display:flex; align-items:center; gap:0.6rem; }
+    .pl-progress-bar { flex:1; height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+    .pl-progress-fill { height:100%; background:var(--lav); border-radius:3px; transition:width 0.3s ease; }
+    .pl-progress-lbl { font-size:0.73rem; color:var(--muted); white-space:nowrap; }
+    /* Event-specific items */
+    .pl-item--event { background:#faf5ff; }
+    .pl-item--event .pl-item-lbl { color:var(--text); }
+    /* Weather hint items */
+    .pl-item--weather { background:#f0fdf4; }
+    .pl-item--weather .pl-item-lbl { color:#166534; }
 
     /* ─── Responsive ─── */
     /* Sync status */
@@ -1992,6 +2003,89 @@ function focusTrip(id) {
 (function () {
   const WX_TTL = 6 * 3600 * 1000;
 
+  // ── Kuratierte Basis-Liste (aus packliste-2026) ───────────────────────────
+  const BASE_CATS = [
+    { id:'dokumente', icon:'📄', name:'Dokumente & Tickets', items:[
+      'Personalausweis / Reisepass','Führerschein','Krankenversicherungskarte (e-card)',
+      'Kreditkarte / Bankomatkarte','Bargeld (lokale Währung)',
+      'Race-Tickets (digital oder ausgedruckt)','Hotel-/Unterkunfts-Bestätigung','Nothilfe-Nummern notiert',
+    ]},
+    { id:'kleidung', icon:'👗', name:'Kleidung', items:[
+      'Hospitality-/Event-Outfit (1–2×)','Lässiges Rennstrecken-Outfit (1–2×)','Abend-Outfit',
+      'Unterwäsche (Nächte + 1)','Socken (Nächte + 1)','Schlafanzug',
+      'Sportliche / bequeme Schuhe','Abendschuhe','Leichte Jacke / Windbreaker',
+      'Regenjacke oder Poncho','Sonnenhut oder Kappe',
+    ]},
+    { id:'technik', icon:'💻', name:'Technik & Gadgets', items:[
+      'Handy + Ladekabel','Powerbank','Kopfhörer','Laptop (wenn nötig)',
+      'Adapter / Universal-Stecker','Airalo eSIM aktiviert',
+      'Kamera + Speicherkarte + Ladekabel','Ohrstöpsel (Rennstrecke!)',
+    ]},
+    { id:'race_gear', icon:'🏎️', name:'Race Gear', items:[
+      'Ohrstöpsel / Gehörschutz','Fernglas','F1/Race-App auf Handy (Live Timing)',
+      'Sonnencreme (hoch LSF)','Sonnenbrille','Kleiner Rucksack / Tasche für die Strecke',
+    ]},
+    { id:'kosmetik', icon:'💄', name:'Kosmetik & Pflege', items:[
+      'Zahnbürste + Zahnpasta','Deo','Duschgel / Shampoo',
+      'Kérastase Ciment Thermique','Haarstyling (Dyson Airwrap Adapter!)',
+      'Gesichtspflege (Tages- & Nachtcreme)','Make-up Basics','Rasierer',
+      'Schmerzmittel / Erste Hilfe','Persönliche Medikamente',
+    ]},
+    { id:'reise', icon:'🏨', name:'Reise & Unterkunft', items:[
+      'Unterkunft bestätigt und gespeichert','Check-in Zeit bekannt',
+      'Parkinformation (bei Auto-Reisen)','Google Maps Offline-Karte heruntergeladen',
+      'Notfall-Kontakte gespeichert',
+    ]},
+    { id:'diverses', icon:'🎒', name:'Diverses', items:[
+      'Wiederverwendbare Wasserflasche','Snacks für Anreise',
+      'Kleine Einkaufstasche','Schloss für Gepäck','Reisekissen (lange Autofahrten)',
+    ]},
+  ];
+
+  // ── Event-spezifische Extras ──────────────────────────────────────────────
+  const EVT_EXTRAS = {
+    brno: [
+      { cat:'dokumente', items:['MotoGP-Tickets / VIP-Zugang Turn 1'] },
+      { cat:'kleidung',  items:['Bequeme Schuhe (viel Laufen — Brno)','Leichte Jacke für Abend'] },
+      { cat:'race_gear', items:['MotoGP-Programm / Zeitplan'] },
+      { cat:'diverses',  items:['Bar-Outfit: Super Panda Circus Speakeasy (Fr/Sa Abend) 🍹'] },
+    ],
+    austria: [
+      { cat:'dokumente', items:['F1-Tickets','Porsche Supercup Hospitality-Pass'] },
+      { cat:'kleidung',  items:['Hospitality-Outfit smart casual (Spielberg)','Regenjacke — Bergwetter Red Bull Ring!'] },
+      { cat:'diverses',  items:['Eleganteres Outfit (Do-Abend: Restaurant Perschler mit Jean Michel & Benjamin)','Direkt nach Brno → bereits im Auto gepackt ✓'] },
+    ],
+    norisring: [
+      { cat:'dokumente', items:['DTM-Tickets','Porsche Carrera Cup Hospitality-Pass (Samstag)'] },
+      { cat:'kleidung',  items:['Hospitality-Outfit (Samstag)','Lässigeres Outfit (Sonntag Grandstand)','Outfit für Tegernsee-Abend (Sonntag)'] },
+      { cat:'diverses',  items:['Sa-Abend: ggf. Dinner mit Benjamin','So-Abend: Tegernsee → AK CARO & SELIG 🥂','Mo: Karin Zug Innsbruck→Wien · David nach Cittadella'] },
+    ],
+    hungary: [
+      { cat:'dokumente', items:['F1-Tickets','Porsche Supercup Hospitality-Pass'] },
+      { cat:'kleidung',  items:['Hospitality-Outfit (Budapest)','Sommerkleid — Budapest ist heiß im Juli! ☀️'] },
+      { cat:'race_gear', items:['Extra Sonnencreme (Hitzeschutz Budapest)','Fächer','Kühlspray'] },
+      { cat:'diverses',  items:['Sa-Abend: Drinks → Abend-Outfit','Nach Rennen: Weiterfahrt → Schönberghof Red Bull Ring','Di: David KTM X-Bow Track Day'] },
+    ],
+    zandvoort: [
+      { cat:'dokumente', items:['Flugtickets ✈️','F1-Tickets','Porsche Supercup Hospitality-Pass','⚠️ Reisepass (Flug!)'] },
+      { cat:'kleidung',  items:['Hospitality-Outfit (Zandvoort)','Windabweisende Jacke — Küste Zandvoort!','Bequeme Schuhe (Amsterdam Sightseeing)'] },
+      { cat:'race_gear', items:['Extra Sonnencreme (Strandlage Zandvoort)','Hut (Strand / Strecke)'] },
+      { cat:'diverses',  items:['Mo: Amsterdam — Museen, Kanäle, Mittagessen','Di: Frühflug → Abend vorher schon packen!','Sprint Weekend — früher vor Ort sein!'] },
+    ],
+    monza: [
+      { cat:'dokumente', items:['Flugtickets Wien → Mailand ✈️','F1-Tickets','Porsche Supercup Hospitality-Pass','⚠️ Reisepass (Flug — Karin)'] },
+      { cat:'kleidung',  items:['Hospitality-Outfit (Monza)','Italiano-chic für Mailand-Abende 🇮🇹','⚠️ Algarve-Koffer SEPARAT packen! (Badezeug, Sommer, Strandtasche)'] },
+      { cat:'diverses',  items:['Do-Abend: Pizza-Dinner mit Mark, Jean Michel & Benjamin 🍕','Sa: ggf. Gruppenessen','✈️ Nach Rennen: Mailand → Faro → W Hotel Algarve (bis Do)'] },
+    ],
+    madrid: [
+      { cat:'dokumente', items:['Flugtickets Faro → Madrid ✈️','F1-Tickets','La Azotea Hospitality-Pass','⚠️ Reisepass (Flug!)'] },
+      { cat:'kleidung',  items:['Elegantes Outfit (La Azotea Rooftop-Bar!) 🥂','Leichte Abendgarderobe (Madrid warm im September)','⚠️ Koffer: noch Algarve-Sachen → neu sortieren!'] },
+      { cat:'diverses',  items:['Fr: Couples-Day mit Tom & Kris','Volles Wochenende mit Tom, Kris & John','Mo: alle fliegen gemeinsam heim'] },
+    ],
+  };
+
+  const TRIP_EVT = { 1:'brno', 2:'austria', 3:'norisring', 4:'hungary', 5:'zandvoort', 6:'monza', 7:'madrid' };
+
   function isoDate(d) { return d.toISOString().slice(0, 10); }
 
   // ── Weather fetch with cache ──────────────────────────────────────────────
@@ -2037,111 +2131,52 @@ function focusTrip(id) {
     return '⛈️';
   }
 
-  // ── Item factory ──────────────────────────────────────────────────────────
-  function mk(tier, label, why, share) {
-    return { tier, label, why, share: !!share, id: label.toLowerCase().replace(/[^a-z0-9]+/g, '_') };
+  // ── Item ID helper ────────────────────────────────────────────────────────
+  function mkId(text) {
+    return text.toLowerCase()
+      .replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss')
+      .replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'').slice(0,45);
   }
 
-  // ── Generate smart items ───────────────────────────────────────────────────
-  function generateItems(trip, plan, ctx, wx) {
-    const flying    = plan.travel && plan.travel.type === 'Flight';
-    const handOnly  = flying && ctx.luggage === 'hand';
-    const withDavid = ctx.companion === 'david';
-    const nights    = Number(plan.hotel && plan.hotel.nights) || 2;
-    const vip       = plan.ticket && plan.ticket.type === 'Hospitality';
+  // ── Kategorien zusammenbauen ──────────────────────────────────────────────
+  function buildCategories(tripId, plan, ctx, wx) {
+    const evtKey = TRIP_EVT[tripId];
+    const extras = EVT_EXTRAS[evtKey] || [];
 
-    const avgMax = wx ? wx.maxTemp.reduce((a, b) => a + b, 0) / wx.maxTemp.length : 22;
-    const avgMin = wx ? wx.minTemp.reduce((a, b) => a + b, 0) / wx.minTemp.length : 14;
-    const rain   = wx ? wx.precipPct.some(p => p > 40) || wx.precip.some(p => p > 3) : false;
-    const storm  = wx ? wx.code.some(c => c >= 95) : false;
-    const cold   = avgMin < 12;
-    const hot    = avgMax > 28;
+    // Basis-Kategorien mit Items als Objekte
+    const cats = BASE_CATS.map(c => ({
+      id: c.id, icon: c.icon, name: c.name,
+      items: c.items.map(text => ({ id: mkId(text), text, type: 'base' }))
+    }));
 
-    const must = [], rec = [], opt = [];
-    const M = (l, w, s) => must.push(mk('must', l, w, s));
-    const R = (l, w, s) => rec.push(mk('rec',  l, w, s));
-    const O = (l, w, s) => opt.push(mk('opt',  l, w, s));
+    // Event-Extras in die passenden Kategorien einfügen
+    extras.forEach(ex => {
+      const cat = cats.find(c => c.id === ex.cat);
+      if (cat) ex.items.forEach(text => cat.items.push({ id: mkId(text), text, type: 'event' }));
+    });
 
-    // Documents & essentials
-    M('Passport / ID', 'Required for international travel');
-    if (flying) M('Flight tickets (digital/print)', 'Need boarding pass at check-in');
-    M('Race tickets / passes', (plan.ticket ? plan.ticket.type : 'Ticket') + ' – bring confirmation');
-    M('Phone + charger', 'Navigation, tickets, live timing');
-    M('Wallet + cash + cards', 'Cards not always accepted at circuits');
-    M('Travel insurance card', 'EU card or credit card cover');
-    if (flying) R('Hotel confirmation (offline)', 'Screenshot or print in case of no signal');
-
-    // Clothing
-    M('Underwear × ' + (nights + 1), nights + ' nights + travel day');
-    M('Socks × ' + (nights + 1), 'One pair per day');
-    M('Jeans / trousers', 'Race days are long; circuits can be cool in the evening');
-    hot ? R('Shorts', 'Avg high ' + Math.round(avgMax) + '°C – likely needed')
-        : O('Shorts', 'In case it warms up');
-    M('T-shirts (2–3)', 'Race wear staple');
-    if (vip) M('Smart casual outfit', 'Hospitality paddock has an implicit dress code');
-
-    // Weather-driven clothing
-    if (storm) {
-      M('Rain jacket / poncho', 'Storms possible – ' + Math.round(Math.max(...wx.precipPct)) + '% rain chance');
-      R('Waterproof shoes / boots', 'Wet grass at circuits gets very muddy');
-    } else if (rain) {
-      M('Rain jacket / poncho', 'Rain forecast – up to ' + Math.round(Math.max(...wx.precipPct)) + '% chance');
-      R('Waterproof shoes', 'Wet grass at circuits gets muddy');
-    } else {
-      R('Light jacket', 'Evenings at circuits can be cool');
-    }
-    if (cold) {
-      M('Warm layer / fleece', 'Avg low ' + Math.round(avgMin) + '°C – exposed grandstands get cold');
-      R('Beanie / warm hat', 'Wind-chill on open grandstands');
-    }
-    if (hot) {
-      M('Sunscreen SPF 50+', 'Avg high ' + Math.round(avgMax) + '°C – hours in direct sun');
-      M('Sunglasses', 'Glare off tarmac and grandstands');
-      R('Cooling towel / fan', 'Helps in hot paddock queues');
-    } else {
-      R('Sunscreen SPF 30', 'Even overcast days have UV reflection off the track');
-      R('Sunglasses', 'Glare protection');
+    // Wetter-Ergänzungen
+    if (wx) {
+      const avgMax = wx.maxTemp.reduce((a,b)=>a+b,0)/wx.maxTemp.length;
+      const avgMin = wx.minTemp.reduce((a,b)=>a+b,0)/wx.minTemp.length;
+      const rain   = wx.precipPct ? wx.precipPct.some(p=>p!=null&&p>40) : wx.precip.some(p=>p>4);
+      const hot    = avgMax > 30;
+      const cold   = avgMin < 10;
+      const wxItems = [];
+      if (hot)  wxItems.push({ id: mkId('wx_spf50_'+Math.round(avgMax)),  text: 'Extra Sonnencreme SPF 50+ — Prognose bis ' + Math.round(avgMax) + '°C ☀️', type:'weather' });
+      if (rain) wxItems.push({ id: mkId('wx_regenschirm'), text: 'Kompakter Regenschirm — Regenwahrscheinlichkeit! 🌧️', type:'weather' });
+      if (cold) wxItems.push({ id: mkId('wx_warm_'+Math.round(avgMin)),   text: 'Warme Zwischenschicht — Prognose min. ' + Math.round(avgMin) + '°C 🧥', type:'weather' });
+      if (wxItems.length) cats.push({ id:'wx_tips', icon:'🌤️', name:'Wetter-Hinweise', items: wxItems });
     }
 
-    // Footwear
-    M('Comfortable walking shoes', 'You walk 10–15 km per race day');
-    if (rain) R('Spare dry shoes', 'Wet feet for 3 days = blisters and misery');
-
-    // Racetrack essentials
-    M('Ear protection / earplugs', 'Essential in standing areas – F1/MotoGP is extremely loud');
-    if (withDavid) M('Spare earplugs for David', 'He always forgets his', true);
-    R('Binoculars', 'Far corners and podium detail are worth it');
-    R('Small backpack / day bag', 'Carry food, rain gear, merch, camera');
-    if (handOnly) R('Packing cubes', 'Essential for fitting everything in a cabin bag', withDavid);
-
-    // Power & tech
-    M('Portable charger (10,000 mAh+)', 'F1 live timing and maps drain battery fast');
-    R('Headphones', 'F1 TV commentary via app is great trackside');
-    if (flying) O('Travel power adapter', trip.name + ' may use a different socket type');
-    O('Camera / GoPro', 'Especially if you have paddock or pit lane access');
-
-    // Food & drink
-    M('Refillable water bottle', 'Water is expensive / scarce inside most circuits');
-    R('Snacks / energy bars', 'Food queues are brutal on race day');
-
-    // Hygiene
-    M('Toiletries bag', 'Basics for ' + nights + ' nights');
-    if (handOnly) M('100ml liquids in clear bag', 'Hand baggage liquid rules are strictly enforced');
-    R('Blister plasters', 'Long days on hard tarmac = blisters');
-    R('Lip balm + hand cream', 'Wind and sun dry out skin fast outdoors');
-    O('Travel laundry tabs', nights > 4 ? 'Long trip – rewash saves space' : 'If travelling very light');
-
-    // Hospitality extras
-    if (vip) {
-      R('Business cards', 'Hospitality is a great networking environment');
-      O('Smart accessories (watch, etc.)', 'Paddock Club is as much social as sport');
+    // Handgepäck-Zusatz bei Flugreisen
+    const flying = plan.travel && plan.travel.type === 'Flight';
+    if (flying && ctx.luggage === 'hand') {
+      const dok = cats.find(c => c.id === 'dokumente');
+      if (dok) dok.items.push({ id:'handgepaeck_100ml', text:'💼 100ml Flüssigkeiten im transparenten Beutel (Handgepäck!)', type:'event' });
     }
 
-    const dedup = arr => {
-      const seen = new Set();
-      return arr.filter(x => { if (seen.has(x.id)) return false; seen.add(x.id); return true; });
-    };
-    return { must: dedup(must), rec: dedup(rec), opt: dedup(opt) };
+    return cats;
   }
 
   // ── Persistence ───────────────────────────────────────────────────────────
@@ -2158,16 +2193,16 @@ function focusTrip(id) {
     try { localStorage.setItem('packingCtx_' + id, JSON.stringify(ctx)); } catch (_) {}
   }
 
-  // ── HTML builders ─────────────────────────────────────────────────────────
+  // ── HTML builder: Wetter-Bar ───────────────────────────────────────────────
   function wxBarHTML(wx, daysAway) {
     if (!wx) return '';
     const notice = daysAway > 16
-      ? '<div class="pl-wx-notice">⚠️ Forecast not yet available — showing last year\'s weather as a reference</div>'
+      ? '<div class="pl-wx-notice">⚠️ Forecast noch nicht verfügbar — Vorjahreswetter als Referenz</div>'
       : '';
     const days = wx.time.map((date, i) => {
-      const d = new Date(date + 'T12:00:00');
-      const lbl = d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric' });
-      const pct = (wx.precipPct && wx.precipPct[i] != null) ? wx.precipPct[i] : Math.round((wx.precip[i] || 0) * 10);
+      const d   = new Date(date + 'T12:00:00');
+      const lbl = d.toLocaleDateString('de-AT', { weekday:'short', day:'numeric' });
+      const pct = (wx.precipPct && wx.precipPct[i] != null) ? wx.precipPct[i] : Math.round((wx.precip[i]||0)*10);
       return '<div class="pl-wx-day"><span>' + lbl + '</span><span>' + wxEmoji(wx.code[i]) + '</span>' +
              '<span>' + Math.round(wx.maxTemp[i]) + '°/' + Math.round(wx.minTemp[i]) + '°</span>' +
              '<span>💧' + pct + '%</span></div>';
@@ -2175,48 +2210,53 @@ function focusTrip(id) {
     return notice + '<div class="pl-wx-bar">' + days + '</div><div class="pl-wx-sep"></div>';
   }
 
+  // ── HTML builder: Gepäck-Kontext (nur bei Flugreisen) ─────────────────────
   function ctxHTML(id, ctx, flying) {
+    if (!flying) return '';
     const B = (key, val, lbl) =>
-      '<button class="pl-ctx-btn' + (ctx[key] === val ? ' pl-ctx-btn--sky' : '') +
+      '<button class="pl-ctx-btn' + (ctx[key]===val?' pl-ctx-btn--sky':'') +
       '" onclick="plCtx(\'' + id + '\',\'' + key + '\',\'' + val + '\')">' + lbl + '</button>';
-    return '<div class="pl-ctx">' +
-      '<div class="pl-ctx-title">Personalise your list</div>' +
-      '<div class="pl-ctx-row"><span class="pl-ctx-lbl">👥 Travelling with</span>' +
-      B('companion','solo','Solo') + B('companion','david','With David') + B('companion','group','Group') + '</div>' +
-      (flying ? '<div class="pl-ctx-row"><span class="pl-ctx-lbl">🧳 Luggage</span>' +
-        B('luggage','hand','Hand only') + B('luggage','checked','Checked bag') + '</div>' : '') +
-      '</div>';
+    return '<div class="pl-ctx"><div class="pl-ctx-title">Gepäck-Typ</div>' +
+      '<div class="pl-ctx-row"><span class="pl-ctx-lbl">🧳 Gepäck</span>' +
+      B('luggage','hand','Nur Handgepäck') + B('luggage','checked','Aufgegebenes Gepäck') +
+      '</div></div>';
   }
 
-  function itemsHTML(sections, state, custom, id) {
-    const LABELS = { must: '🔴 Must-have', rec: '🟡 Recommended', opt: '⚪ Optional' };
-    let html = '';
-    ['must', 'rec', 'opt'].forEach(tier => {
-      const items = sections[tier];
-      if (!items || !items.length) return;
-      html += '<div class="pl-section"><div class="pl-sec-head">' + LABELS[tier] + '</div><ul class="pl-list">';
-      items.forEach(it => {
-        const chk   = state[it.id] ? ' checked' : '';
-        const share = it.share ? '<span class="pl-share" title="Shareable with David">👫</span>' : '';
-        html += '<li class="pl-item' + (state[it.id] ? ' checked' : '') + '">' +
+  // ── HTML builder: Kategorien-Liste ────────────────────────────────────────
+  function catsHTML(cats, state, custom, id) {
+    const allItems = cats.flatMap(c => c.items);
+    const done     = allItems.filter(i => state[i.id]).length;
+    const total    = allItems.length;
+    let html = total > 0
+      ? '<div class="pl-progress"><div class="pl-progress-bar"><div class="pl-progress-fill" style="width:' +
+        Math.round(done/total*100) + '%"></div></div><span class="pl-progress-lbl">' +
+        done + ' / ' + total + ' gepackt</span></div>'
+      : '';
+
+    cats.forEach(cat => {
+      html += '<div class="pl-section"><div class="pl-sec-head">' + cat.icon + ' ' + cat.name + '</div><ul class="pl-list">';
+      cat.items.forEach(it => {
+        const chk = state[it.id] ? ' checked' : '';
+        const cls = 'pl-item' + (state[it.id]?' checked':'') +
+                    (it.type==='event'?' pl-item--event':it.type==='weather'?' pl-item--weather':'');
+        html += '<li class="' + cls + '">' +
           '<input type="checkbox" class="pl-cb" id="plcb_' + it.id + '"' + chk +
           ' onchange="plCheck(\'' + it.id + '\',this.checked)">' +
-          '<label class="pl-item-lbl" for="plcb_' + it.id + '">' + it.label + '</label>' +
-          '<span class="pl-icons">' + share +
-          '<span class="pl-info" tabindex="0">ℹ️<span class="pl-tt">' + it.why + '</span></span></span></li>';
+          '<label class="pl-item-lbl" for="plcb_' + it.id + '">' + it.text + '</label></li>';
       });
       html += '</ul></div>';
     });
+
     if (custom && custom.length) {
-      html += '<div class="pl-section"><div class="pl-sec-head">📌 Your items</div><ul class="pl-list">';
+      html += '<div class="pl-section"><div class="pl-sec-head">📌 Eigene Items</div><ul class="pl-list">';
       custom.forEach((lbl, i) => {
         const cid = 'custom_' + i;
         const chk = state[cid] ? ' checked' : '';
-        html += '<li class="pl-item pl-item--custom' + (state[cid] ? ' checked' : '') + '">' +
+        html += '<li class="pl-item pl-item--custom' + (state[cid]?' checked':'') + '">' +
           '<input type="checkbox" class="pl-cb" id="plcb_' + cid + '"' + chk +
           ' onchange="plCheck(\'' + cid + '\',this.checked)">' +
           '<label class="pl-item-lbl" for="plcb_' + cid + '">' + lbl + '</label>' +
-          '<span class="pl-icons"><button class="pl-del" onclick="plRemoveCustom(\'' + id + '\',' + i + ')" title="Remove">✕</button></span></li>';
+          '<span class="pl-icons"><button class="pl-del" onclick="plRemoveCustom(\'' + id + '\',' + i + ')" title="Entfernen">✕</button></span></li>';
       });
       html += '</ul></div>';
     }
@@ -2226,32 +2266,31 @@ function focusTrip(id) {
   function actionsHTML(id) {
     return '<div class="pl-actions">' +
       '<button class="pl-btn" onclick="plReset(\'' + id + '\')">🔄 Reset</button>' +
-      '<button class="pl-btn" onclick="plCopy(\'' + id + '\')">📋 Copy</button>' +
+      '<button class="pl-btn" onclick="plCopy(\'' + id + '\')">📋 Kopieren</button>' +
       '<button class="pl-btn" onclick="plRegenerate(\'' + id + '\')">🔁 Regen</button>' +
-      '</div>' +
-      '<div class="pl-add-form"><div class="pl-add-row">' +
-      '<input type="text" class="pm-inp" id="pl-add-inp-' + id + '" placeholder="Add item…"' +
+      '</div><div class="pl-add-form"><div class="pl-add-row">' +
+      '<input type="text" class="pm-inp" id="pl-add-inp-' + id + '" placeholder="Eigenes Item hinzufügen…"' +
       ' onkeydown="if(event.key===\'Enter\')plSaveCustom(\'' + id + '\')">' +
       '<button class="pl-add-btn" onclick="plSaveCustom(\'' + id + '\')">➕</button>' +
       '</div></div>';
   }
 
   // ── Render state ──────────────────────────────────────────────────────────
-  let curPlId     = null;
-  let curSections = null;
+  let curPlId = null;
+  let curCats = null;
 
   // ── Main render ───────────────────────────────────────────────────────────
   window.renderPackingTab = async function (id) {
     curPlId = id;
     const container = document.getElementById('pm-tab-packing');
     if (!container) return;
-    container.innerHTML = '<div class="pl-loading">⏳ Building your packing list…</div>';
+    container.innerHTML = '<div class="pl-loading">⏳ Liste wird aufgebaut…</div>';
 
     const trip = TRIPS.find(x => x.id == id);
-    if (!trip) { container.innerHTML = '<div class="pl-loading">Trip not found.</div>'; return; }
+    if (!trip) { container.innerHTML = '<div class="pl-loading">Trip nicht gefunden.</div>'; return; }
 
     const plan   = window.loadPlan ? window.loadPlan(id) : {};
-    const ctx    = loadCtx(id) || { companion: 'solo', luggage: 'checked' };
+    const ctx    = loadCtx(id) || { luggage: 'checked' };
     const state  = loadState(id);
     const custom = state.__custom || [];
     const away   = daysTo(trip.start);
@@ -2260,18 +2299,18 @@ function focusTrip(id) {
     let wx = null;
     try { wx = await getWeather(trip); } catch (_) {}
 
-    curSections = generateItems(trip, plan, ctx, wx);
+    curCats = buildCategories(id, plan, ctx, wx);
 
     container.innerHTML =
       wxBarHTML(wx, away) +
       ctxHTML(id, ctx, flying) +
-      itemsHTML(curSections, state, custom, id) +
+      catsHTML(curCats, state, custom, id) +
       actionsHTML(id);
   };
 
-  // ── Global action handlers ────────────────────────────────────────────────
+  // ── Globale Handler ────────────────────────────────────────────────────────
   window.plCtx = function (id, key, val) {
-    const ctx = loadCtx(id) || { companion: 'solo', luggage: 'checked' };
+    const ctx = loadCtx(id) || { luggage: 'checked' };
     ctx[key] = val;
     saveCtx(id, ctx);
     if (window.fbSavePacking) window.fbSavePacking(id);
@@ -2286,6 +2325,14 @@ function focusTrip(id) {
     if (window.fbSavePacking) window.fbSavePacking(curPlId);
     const cb = document.getElementById('plcb_' + itemId);
     if (cb) cb.closest('.pl-item').classList.toggle('checked', checked);
+    // Progress aktualisieren
+    const allItems = (curCats||[]).flatMap(c=>c.items);
+    const st2  = loadState(curPlId);
+    const done = allItems.filter(i=>st2[i.id]).length;
+    const fill = document.querySelector('.pl-progress-fill');
+    const lbl  = document.querySelector('.pl-progress-lbl');
+    if (fill) fill.style.width = (allItems.length ? Math.round(done/allItems.length*100) : 0) + '%';
+    if (lbl)  lbl.textContent = done + ' / ' + allItems.length + ' gepackt';
   };
 
   window.plReset = function (id) {
@@ -2297,6 +2344,11 @@ function focusTrip(id) {
       cb.checked = false;
       cb.closest('.pl-item').classList.remove('checked');
     });
+    const fill = document.querySelector('.pl-progress-fill');
+    const lbl  = document.querySelector('.pl-progress-lbl');
+    const total = (curCats||[]).flatMap(c=>c.items).length;
+    if (fill) fill.style.width = '0%';
+    if (lbl)  lbl.textContent = '0 / ' + total + ' gepackt';
   };
 
   window.plSaveCustom = function (id) {
@@ -2309,6 +2361,7 @@ function focusTrip(id) {
     custom.push(lbl);
     state.__custom = custom;
     saveState(id, state);
+    if (window.fbSavePacking) window.fbSavePacking(id);
     inp.value = '';
     window.renderPackingTab(id);
   };
@@ -2321,29 +2374,28 @@ function focusTrip(id) {
     custom.splice(idx, 1);
     state.__custom = custom;
     saveState(id, state);
+    if (window.fbSavePacking) window.fbSavePacking(id);
     window.renderPackingTab(id);
   };
 
   window.plCopy = function (id) {
-    if (!curSections) return;
+    if (!curCats) return;
     const state  = loadState(id);
     const custom = state.__custom || [];
-    const trip   = (TRIPS).find(x => x.id === id);
-    const lines  = ['📋 Packing list – ' + (trip ? trip.name : id), ''];
-    const LABELS = { must: '🔴 Must-have', rec: '🟡 Recommended', opt: '⚪ Optional' };
-    ['must', 'rec', 'opt'].forEach(tier => {
-      if (!curSections[tier].length) return;
-      lines.push(LABELS[tier]);
-      curSections[tier].forEach(it => lines.push((state[it.id] ? '✅' : '⬜') + ' ' + it.label));
+    const trip   = TRIPS.find(x => x.id == id);
+    const lines  = ['📋 Packliste – ' + (trip ? trip.name : id), ''];
+    curCats.forEach(cat => {
+      lines.push(cat.icon + ' ' + cat.name);
+      cat.items.forEach(it => lines.push((state[it.id]?'✅':'⬜') + ' ' + it.text));
       lines.push('');
     });
     if (custom.length) {
-      lines.push('📌 Your items');
-      custom.forEach((lbl, i) => lines.push((state['custom_' + i] ? '✅' : '⬜') + ' ' + lbl));
+      lines.push('📌 Eigene Items');
+      custom.forEach((lbl, i) => lines.push((state['custom_'+i]?'✅':'⬜') + ' ' + lbl));
     }
     navigator.clipboard.writeText(lines.join('\n')).then(() => {
       const btn = document.querySelector('#pm-tab-packing .pl-btn[onclick*="plCopy"]');
-      if (btn) { btn.textContent = '✓ Copied!'; setTimeout(() => { btn.textContent = '📋 Copy'; }, 1800); }
+      if (btn) { btn.textContent = '✓ Kopiert!'; setTimeout(() => { btn.textContent = '📋 Kopieren'; }, 1800); }
     });
   };
 
