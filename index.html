@@ -99,31 +99,42 @@
     }
     .hdr__badge {
       display: inline-flex;
-      align-items: center;
-      gap: 0.55rem;
-      padding: 0.65rem 1.5rem;
-      background: rgba(255,255,255,0.12);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1.5px solid rgba(255,255,255,0.28);
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 1rem 1.5rem 1.1rem;
+      background: rgba(255,255,255,0.11);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1.5px solid rgba(255,255,255,0.25);
       color: #fff;
-      border-radius: var(--r-pill);
-      font-size: 1.15rem;
-      font-weight: 600;
+      border-radius: 1.1rem;
       align-self: flex-start;
-      letter-spacing: -0.01em;
     }
-    .hdr__badge--live {
-      background: rgba(249,115,22,0.65);
-      border-color: rgba(249,115,22,0.5);
+    .hdr__badge--live  { background: rgba(249,115,22,0.55); border-color: rgba(249,115,22,0.45); }
+    .hdr__badge--done  { background: rgba(134,239,172,0.12); border-color: rgba(134,239,172,0.3); color:#bbf7d0; }
+    .hdr__badge-name {
+      display: flex; align-items: center; gap: 0.45rem;
+      font-size: 0.82rem; font-weight: 400; opacity: 0.72; letter-spacing: 0.01em;
     }
-    .hdr__badge--done {
-      background: rgba(134,239,172,0.15);
-      border-color: rgba(134,239,172,0.35);
-      color: #bbf7d0;
+    .hdr__cds {
+      display: flex; align-items: center; gap: 1.1rem;
+    }
+    .hdr__cd {
+      display: flex; flex-direction: column; align-items: center; gap: 0.1rem; min-width: 72px;
+    }
+    .hdr__cd-num {
+      font-size: 2.6rem; font-weight: 700; line-height: 1;
+      letter-spacing: -0.05em;
+    }
+    .hdr__cd-lbl {
+      font-size: 0.65rem; opacity: 0.65; font-weight: 400;
+      text-transform: uppercase; letter-spacing: 0.08em; text-align: center;
+    }
+    .hdr__cd-sep {
+      width: 1px; height: 44px; background: rgba(255,255,255,0.22); flex-shrink: 0;
     }
     .badge-dot {
-      width: 8px; height: 8px;
+      width: 7px; height: 7px;
       border-radius: 50%;
       background: rgba(255,255,255,0.9);
       animation: blink 1.4s ease-in-out infinite;
@@ -133,33 +144,7 @@
       0%, 100% { opacity: 1; }
       50%       { opacity: 0.25; }
     }
-    .hdr__stats {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.2rem 0;
-      align-items: stretch;
-    }
-    .stat {
-      display: flex;
-      flex-direction: column;
-      padding: 0 1.3rem 0 0;
-      margin-right: 1rem;
-      border-right: 1px solid rgba(255,255,255,0.18);
-    }
-    .stat:last-child { border-right: none; }
-    .stat__val {
-      font-size: 1.55rem;
-      font-weight: 500;
-      letter-spacing: -0.03em;
-      line-height: 1;
-      color: #fff;
-    }
-    .stat__lbl {
-      font-size: 0.72rem;
-      color: rgba(255,255,255,0.55);
-      margin-top: 0.2rem;
-      font-weight: 300;
-    }
+    .hdr__stats { display: none; }
     /* Sync in hero */
     .sync-status          { color: rgba(255,255,255,0.45) !important; }
     .sync-status--synced  { color: rgba(255,255,255,0.50) !important; }
@@ -939,15 +924,21 @@
       <p class="hdr__sub">Karin &amp; David's race travel calendar</p>
     </div>
     <div id="badge" class="hdr__badge">
-      <span class="badge-dot"></span>
-      <span id="badge-text">Loading…</span>
-    </div>
-    <div class="hdr__stats">
-      <div class="stat"><span class="stat__val">7</span><span class="stat__lbl">race weekends</span></div>
-      <div class="stat"><span class="stat__val">7</span><span class="stat__lbl">countries</span></div>
-      <div class="stat"><span class="stat__val">5</span><span class="stat__lbl">F1 Grands Prix</span></div>
-      <div class="stat"><span class="stat__val">1</span><span class="stat__lbl">MotoGP round</span></div>
-      <div class="stat"><span class="stat__val">1</span><span class="stat__lbl">DTM round</span></div>
+      <div class="hdr__badge-name">
+        <span class="badge-dot"></span>
+        <span id="badge-text">Loading…</span>
+      </div>
+      <div class="hdr__cds" id="hdr-cds">
+        <div class="hdr__cd">
+          <span class="hdr__cd-num" id="cd-prac">—</span>
+          <span class="hdr__cd-lbl" id="cd-prac-lbl">days to Practice</span>
+        </div>
+        <div class="hdr__cd-sep"></div>
+        <div class="hdr__cd">
+          <span class="hdr__cd-num" id="cd-race">—</span>
+          <span class="hdr__cd-lbl" id="cd-race-lbl">days to Race</span>
+        </div>
+      </div>
     </div>
     <div class="hdr__sync">
       <span class="sync-status" id="sync-status">☁️ Connecting…</span>
@@ -1419,30 +1410,44 @@ function isActive(i) { return STATUSES[i] === 'active'; }
 
 /* ══ Header badge + hero photo ═══════════════════════════════════════════ */
 (function () {
-  const badgeEl = document.getElementById('badge');
-  const textEl  = document.getElementById('badge-text');
-  const hdrEl   = document.getElementById('hdr');
-  const nextIdx = STATUSES.indexOf('next');
-  const liveIdx = STATUSES.indexOf('active');
+  const badgeEl  = document.getElementById('badge');
+  const textEl   = document.getElementById('badge-text');
+  const hdrEl    = document.getElementById('hdr');
+  const cdsEl    = document.getElementById('hdr-cds');
+  const pracNumEl = document.getElementById('cd-prac');
+  const pracLblEl = document.getElementById('cd-prac-lbl');
+  const raceNumEl = document.getElementById('cd-race');
+  const raceLblEl = document.getElementById('cd-race-lbl');
+  const nextIdx  = STATUSES.indexOf('next');
+  const liveIdx  = STATUSES.indexOf('active');
+
+  function setCD(numEl, lblEl, days, labelText) {
+    if (days > 1)      { numEl.textContent = days;  lblEl.textContent = 'days · ' + labelText; }
+    else if (days === 1){ numEl.textContent = '1';   lblEl.textContent = 'day · ' + labelText; }
+    else if (days === 0){ numEl.textContent = '🏁';  lblEl.textContent = labelText + ' today!'; }
+    else               { numEl.textContent = '✓';   lblEl.textContent = labelText + ' done'; }
+  }
 
   let heroTrip = null;
 
   if (liveIdx >= 0) {
     const t = TRIPS[liveIdx];
-    textEl.textContent = `🔴 Live now · ${t.flag} ${t.name}`;
+    textEl.textContent = `🔴 Live · ${t.flag} ${t.name}`;
     badgeEl.classList.add('hdr__badge--live');
     heroTrip = t;
+    setCD(pracNumEl, pracLblEl, daysTo(t.start), 'Practice');
+    setCD(raceNumEl, raceLblEl, daysTo(t.end),   'Race');
   } else if (nextIdx >= 0) {
     const t = TRIPS[nextIdx];
-    const d = daysTo(t.start);
-    textEl.textContent = d === 1
-      ? `Next trip tomorrow · ${t.flag} ${t.name}`
-      : `Next trip in ${d} days · ${t.flag} ${t.name}`;
+    textEl.textContent = `${t.flag} ${t.name}`;
     heroTrip = t;
+    setCD(pracNumEl, pracLblEl, daysTo(t.start), 'Practice');
+    setCD(raceNumEl, raceLblEl, daysTo(t.end),   'Race');
   } else {
     textEl.textContent = '🎉 Season complete — what a year!';
     badgeEl.classList.add('hdr__badge--done');
     badgeEl.querySelector('.badge-dot').style.display = 'none';
+    if (cdsEl) cdsEl.style.display = 'none';
     heroTrip = TRIPS[TRIPS.length - 1];
   }
 
