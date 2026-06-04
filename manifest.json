@@ -1,0 +1,19 @@
+{
+  "name": "Motorsport 2026",
+  "short_name": "Motorsport",
+  "description": "Karin & David's race travel calendar",
+  "start_url": "/motorsport-2026/",
+  "scope": "/motorsport-2026/",
+  "display": "standalone",
+  "background_color": "#0d0520",
+  "theme_color": "#0d0520",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "images/02-spielberg.jpg",
+      "sizes": "any",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}
