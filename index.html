@@ -142,9 +142,14 @@
       font-size: 0.6rem; color: rgba(255,255,255,0.5);
       text-transform: uppercase; letter-spacing: 0.1em; font-weight: 400;
     }
-    .hdr__cd-sep {
-      width: 1px; height: 32px; background: rgba(255,255,255,0.2);
-      align-self: center; flex-shrink: 0;
+    .hdr__next {
+      font-size: 0.8rem; color: rgba(255,255,255,0.82);
+      display: flex; align-items: center; gap: 0.3rem;
+      font-weight: 400;
+    }
+    .hdr__wx-mini {
+      font-size: 0.78rem; color: rgba(255,255,255,0.65);
+      display: flex; align-items: center; gap: 0.4rem;
     }
     .badge-dot {
       width: 7px; height: 7px;
@@ -960,15 +965,14 @@
       </div>
       <div class="hdr__cds" id="hdr-cds">
         <div class="hdr__cd">
-          <span class="hdr__cd-num" id="cd-prac">—</span>
-          <span class="hdr__cd-lbl" id="cd-prac-lbl">days to Practice</span>
-        </div>
-        <div class="hdr__cd-sep"></div>
-        <div class="hdr__cd">
           <span class="hdr__cd-num" id="cd-race">—</span>
           <span class="hdr__cd-lbl" id="cd-race-lbl">days to Race</span>
         </div>
       </div>
+      <div class="hdr__next" id="hdr-next" style="display:none">
+        🏁 <span id="hdr-next-text"></span>
+      </div>
+      <div class="hdr__wx-mini" id="hdr-wx" style="display:none"></div>
     </div>
     <div class="hdr__sync">
       <span class="sync-status" id="sync-status">☁️ Connecting…</span>
@@ -1468,44 +1472,109 @@ function isActive(i) { return STATUSES[i] === 'active'; }
 
 /* ══ Header badge + hero photo ═══════════════════════════════════════════ */
 (function () {
-  const badgeEl  = document.getElementById('badge');
-  const textEl   = document.getElementById('badge-text');
-  const hdrEl    = document.getElementById('hdr');
-  const cdsEl    = document.getElementById('hdr-cds');
-  const pracNumEl = document.getElementById('cd-prac');
-  const pracLblEl = document.getElementById('cd-prac-lbl');
+  const badgeEl   = document.getElementById('badge');
+  const textEl    = document.getElementById('badge-text');
+  const hdrEl     = document.getElementById('hdr');
+  const cdsEl     = document.getElementById('hdr-cds');
   const raceNumEl = document.getElementById('cd-race');
   const raceLblEl = document.getElementById('cd-race-lbl');
-  const nextIdx  = STATUSES.indexOf('next');
-  const liveIdx  = STATUSES.indexOf('active');
+  const nextEl    = document.getElementById('hdr-next');
+  const nextTextEl= document.getElementById('hdr-next-text');
+  const wxEl      = document.getElementById('hdr-wx');
+  const nextIdx   = STATUSES.indexOf('next');
+  const liveIdx   = STATUSES.indexOf('active');
 
-  function setCD(numEl, lblEl, days, labelText) {
-    if (days > 1)      { numEl.textContent = days;  lblEl.textContent = 'days · ' + labelText; }
-    else if (days === 1){ numEl.textContent = '1';   lblEl.textContent = 'day · ' + labelText; }
-    else if (days === 0){ numEl.textContent = '🏁';  lblEl.textContent = labelText + ' today!'; }
-    else               { numEl.textContent = '✓';   lblEl.textContent = labelText + ' done'; }
+  /* ── Parse "Sa 20.06" + "15:00" → Date(2026, …) ─────────────────────── */
+  function parseSessionDt(dayStr, timeStr) {
+    const datePart = dayStr.trim().split(' ').pop(); // "20.06"
+    const [d, m]   = datePart.split('.').map(Number);
+    const [h, min] = timeStr.split(':').map(Number);
+    return new Date(2026, m - 1, d, h, min, 0);
+  }
+
+  /* ── Next upcoming session for a trip ───────────────────────────────── */
+  function getNextSession(trip) {
+    if (!trip.schedule) return null;
+    const now = Date.now();
+    for (const s of trip.schedule) {
+      if (s.time === 'TBA') continue;
+      if (parseSessionDt(s.day, s.time).getTime() > now) return s;
+    }
+    return null;
+  }
+
+  /* ── Human countdown ─────────────────────────────────────────────────── */
+  function fmtCD(ms) {
+    if (ms <= 0) return 'jetzt';
+    const h = Math.floor(ms / 3600000);
+    const m = Math.floor((ms % 3600000) / 60000);
+    if (h >= 24) return 'morgen';
+    if (h > 0)   return `in ${h}h ${m}min`;
+    return `in ${m}min`;
+  }
+
+  /* ── Weather mini from cache ─────────────────────────────────────────── */
+  function wxEmoji(c) {
+    if (c<=1) return '☀️'; if (c<=3) return '⛅'; if (c<=48) return '🌫️';
+    if (c<=67) return '🌧️'; if (c<=77) return '❄️'; if (c<=82) return '🌦️';
+    return '⛈️';
+  }
+  function showWx(trip, forDate) {
+    try {
+      const cached = JSON.parse(localStorage.getItem('weatherCache_' + trip.id) || 'null');
+      if (!cached || !cached.data) return;
+      const wx  = cached.data;
+      const key = forDate.toISOString().slice(0, 10);
+      const i   = wx.time.indexOf(key);
+      if (i < 0) return;
+      const pct = wx.precipPct && wx.precipPct[i] != null ? ` · 💧${wx.precipPct[i]}%` : '';
+      wxEl.innerHTML = `${wxEmoji(wx.code[i])} ${Math.round(wx.maxTemp[i])}° / ${Math.round(wx.minTemp[i])}°${pct}`;
+      wxEl.style.display = '';
+    } catch (_) {}
+  }
+
+  /* ── Set race countdown ──────────────────────────────────────────────── */
+  function setRaceCD(d) {
+    if (d > 1)      { raceNumEl.textContent = d;    raceLblEl.textContent = 'days to Race'; }
+    else if (d ===1){ raceNumEl.textContent = '1';  raceLblEl.textContent = 'day to Race'; }
+    else if (d ===0){ raceNumEl.textContent = '🏆'; raceLblEl.textContent = 'Race Day!'; }
+    else            { cdsEl.style.display   = 'none'; }
   }
 
   let heroTrip = null;
 
   if (liveIdx >= 0) {
     const t = TRIPS[liveIdx];
-    textEl.textContent = `🔴 Live · ${t.flag} ${t.name}`;
+    textEl.textContent = `🔴 ${t.flag} ${t.name}`;
     badgeEl.classList.add('hdr__badge--live');
     heroTrip = t;
-    setCD(pracNumEl, pracLblEl, daysTo(t.start), 'Practice');
-    setCD(raceNumEl, raceLblEl, daysTo(t.end),   'Race');
+    setRaceCD(daysTo(t.end));
+    const ns = getNextSession(t);
+    if (ns) {
+      nextTextEl.textContent = `${ns.label} ${fmtCD(parseSessionDt(ns.day, ns.time) - Date.now())} · ${ns.time}`;
+      nextEl.style.display = '';
+    }
+    showWx(t, new Date());
+
   } else if (nextIdx >= 0) {
     const t = TRIPS[nextIdx];
     textEl.textContent = `${t.flag} ${t.name}`;
     heroTrip = t;
-    setCD(pracNumEl, pracLblEl, daysTo(t.start), 'Practice');
-    setCD(raceNumEl, raceLblEl, daysTo(t.end),   'Race');
+    setRaceCD(daysTo(t.end));
+    if (daysTo(t.start) <= 3) {
+      const ns = getNextSession(t);
+      if (ns) {
+        nextTextEl.textContent = `${ns.label} ${fmtCD(parseSessionDt(ns.day, ns.time) - Date.now())} · ${ns.time}`;
+        nextEl.style.display = '';
+      }
+      showWx(t, t.start);
+    }
+
   } else {
     textEl.textContent = '🎉 Season complete — what a year!';
     badgeEl.classList.add('hdr__badge--done');
     badgeEl.querySelector('.badge-dot').style.display = 'none';
-    if (cdsEl) cdsEl.style.display = 'none';
+    cdsEl.style.display = 'none';
     heroTrip = TRIPS[TRIPS.length - 1];
   }
 
