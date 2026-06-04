@@ -54,50 +54,78 @@
       font-size: 15px;
     }
 
-    /* ─── Header ─── */
+    /* ─── Header Hero ─── */
     .hdr {
-      background: linear-gradient(150deg, #fffbeb 0%, #fdf4ff 55%, #eff6ff 100%);
-      border-bottom: 1px solid var(--border);
-      padding: 3rem 1.5rem 2.5rem;
+      position: relative;
+      overflow: hidden;
+      background-color: #0d0520;
+      background-size: cover;
+      background-position: center 30%;
+      min-height: 320px;
+      border-bottom: none;
+      padding: 0;
+      transition: background-image 0.4s ease;
+    }
+    .hdr__overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(155deg,
+        rgba(12,4,35,0.82) 0%,
+        rgba(80,20,130,0.52) 45%,
+        rgba(10,4,28,0.88) 100%);
+      pointer-events: none;
     }
     .hdr__inner {
+      position: relative; z-index: 1;
       max-width: 1160px;
       margin: 0 auto;
+      padding: 2.8rem 2rem 2.2rem;
       display: flex;
       flex-direction: column;
       gap: 1.1rem;
     }
     .hdr__title {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 500;
-      letter-spacing: -0.025em;
-      line-height: 1.1;
-      color: var(--text);
+      font-size: clamp(2.4rem, 5vw, 3.6rem);
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      color: #fff;
+      text-shadow: 0 2px 24px rgba(0,0,0,0.35);
     }
     .hdr__sub {
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 300;
-      color: var(--text2);
-      margin-top: -0.4rem;
+      color: rgba(255,255,255,0.65);
+      margin-top: -0.5rem;
     }
     .hdr__badge {
       display: inline-flex;
       align-items: center;
-      gap: 0.45rem;
-      padding: 0.42rem 1.1rem;
-      background: var(--lav);
+      gap: 0.55rem;
+      padding: 0.65rem 1.5rem;
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1.5px solid rgba(255,255,255,0.28);
       color: #fff;
       border-radius: var(--r-pill);
-      font-size: 0.875rem;
-      font-weight: 500;
+      font-size: 1.15rem;
+      font-weight: 600;
       align-self: flex-start;
+      letter-spacing: -0.01em;
     }
-    .hdr__badge--live { background: #f97316; }
-    .hdr__badge--done { background: var(--sage); color: #14532d; }
+    .hdr__badge--live {
+      background: rgba(249,115,22,0.65);
+      border-color: rgba(249,115,22,0.5);
+    }
+    .hdr__badge--done {
+      background: rgba(134,239,172,0.15);
+      border-color: rgba(134,239,172,0.35);
+      color: #bbf7d0;
+    }
     .badge-dot {
-      width: 6px; height: 6px;
+      width: 8px; height: 8px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.85);
+      background: rgba(255,255,255,0.9);
       animation: blink 1.4s ease-in-out infinite;
       flex-shrink: 0;
     }
@@ -116,7 +144,7 @@
       flex-direction: column;
       padding: 0 1.3rem 0 0;
       margin-right: 1rem;
-      border-right: 1px solid var(--border);
+      border-right: 1px solid rgba(255,255,255,0.18);
     }
     .stat:last-child { border-right: none; }
     .stat__val {
@@ -124,14 +152,19 @@
       font-weight: 500;
       letter-spacing: -0.03em;
       line-height: 1;
-      color: var(--text);
+      color: #fff;
     }
     .stat__lbl {
       font-size: 0.72rem;
-      color: var(--muted);
+      color: rgba(255,255,255,0.55);
       margin-top: 0.2rem;
       font-weight: 300;
     }
+    /* Sync in hero */
+    .sync-status          { color: rgba(255,255,255,0.45) !important; }
+    .sync-status--synced  { color: rgba(255,255,255,0.50) !important; }
+    .sync-status--syncing { color: rgba(255,255,255,0.70) !important; }
+    .sync-status--offline { color: #fca5a5 !important; }
 
     /* ─── Section wrapper ─── */
     .sec {
@@ -879,7 +912,9 @@
     .sync-status--offline { color: #dc2626; }
 
     @media (max-width: 640px) {
-      .hdr            { padding: 2rem 1rem 2rem; }
+      .hdr            { min-height: 260px; }
+      .hdr__inner     { padding: 2rem 1.1rem 1.8rem; }
+      .hdr__badge     { font-size: 0.95rem; padding: 0.55rem 1.1rem; }
       .sec            { padding: 1.75rem 1rem; }
       .cards          { grid-template-columns: 1fr; }
       #map            { height: 360px; }
@@ -896,7 +931,8 @@
 <body>
 
 <!-- ════ HEADER ════ -->
-<header class="hdr">
+<header class="hdr" id="hdr">
+  <div class="hdr__overlay"></div>
   <div class="hdr__inner">
     <div>
       <h1 class="hdr__title">Motorsport 2026 🏁</h1>
@@ -1381,27 +1417,37 @@ const STATUSES = TRIPS.map(t => {
 function isNext(i)   { return STATUSES[i] === 'next'; }
 function isActive(i) { return STATUSES[i] === 'active'; }
 
-/* ══ Header badge ════════════════════════════════════════════════════════ */
+/* ══ Header badge + hero photo ═══════════════════════════════════════════ */
 (function () {
   const badgeEl = document.getElementById('badge');
   const textEl  = document.getElementById('badge-text');
+  const hdrEl   = document.getElementById('hdr');
   const nextIdx = STATUSES.indexOf('next');
   const liveIdx = STATUSES.indexOf('active');
+
+  let heroTrip = null;
 
   if (liveIdx >= 0) {
     const t = TRIPS[liveIdx];
     textEl.textContent = `🔴 Live now · ${t.flag} ${t.name}`;
     badgeEl.classList.add('hdr__badge--live');
+    heroTrip = t;
   } else if (nextIdx >= 0) {
     const t = TRIPS[nextIdx];
     const d = daysTo(t.start);
     textEl.textContent = d === 1
       ? `Next trip tomorrow · ${t.flag} ${t.name}`
       : `Next trip in ${d} days · ${t.flag} ${t.name}`;
+    heroTrip = t;
   } else {
     textEl.textContent = '🎉 Season complete — what a year!';
     badgeEl.classList.add('hdr__badge--done');
     badgeEl.querySelector('.badge-dot').style.display = 'none';
+    heroTrip = TRIPS[TRIPS.length - 1];
+  }
+
+  if (heroTrip && heroTrip.photo && hdrEl) {
+    hdrEl.style.backgroundImage = `url('images/${heroTrip.photo}')`;
   }
 }());
 
